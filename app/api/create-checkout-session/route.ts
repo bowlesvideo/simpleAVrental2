@@ -10,9 +10,13 @@ if (!process.env.NEXT_PUBLIC_BASE_URL) {
   throw new Error('NEXT_PUBLIC_BASE_URL is not set')
 }
 
+// Initialize Stripe with live mode configuration
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2024-12-18.acacia'
 })
+
+// Log the Stripe mode for debugging
+console.log('Stripe Mode:', process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_') ? 'live' : 'test')
 
 export async function POST(request: Request) {
   try {
