@@ -1,0 +1,1 @@
+// Removed NextAuth configuration as it's not needed for the admin page. 
