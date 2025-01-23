@@ -684,7 +684,7 @@ const AdminPage = () => {
                             <AccordionTrigger className="hover:no-underline">
                               <div className="flex items-center space-x-2">
                                 <span className="font-semibold text-gray-900">{pkg.name}</span>
-                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 shadow-sm border border-blue-200">${pkg.price}</Badge>
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 shadow-sm border border-blue-200">${pkg.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Badge>
                               </div>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -945,7 +945,7 @@ const AdminPage = () => {
                             <AccordionTrigger className="hover:no-underline">
                               <div className="flex items-center space-x-2">
                                 <span className="font-semibold">{addon.name}</span>
-                                <Badge variant="secondary">${addon.price}</Badge>
+                                <Badge variant="secondary">${addon.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Badge>
                               </div>
                             </AccordionTrigger>
                             <AccordionContent>
@@ -1138,7 +1138,7 @@ const AdminPage = () => {
                                 {order.status}
                               </Badge>
                             </td>
-                            <td className="px-4 py-3 text-right">${order.total.toFixed(2)}</td>
+                            <td className="px-4 py-3 text-right">${order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                             <td className="px-4 py-3">
                               <button
                                 onClick={(e) => {

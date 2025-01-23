@@ -65,15 +65,15 @@ export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
           ${data.items.map(item => `
             <div style="margin: 10px 0;">
               <p style="margin: 5px 0;">
-                ${item.name} - $${item.price.toFixed(2)}
+                ${item.name} - $${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           `).join('')}
           
           <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
-            <p><strong>Total Amount:</strong> $${data.total.toFixed(2)}</p>
-            <p><strong>Initial Payment:</strong> $${(data.total / 2).toFixed(2)} (50% deposit)</p>
-            <p><strong>Remaining Balance:</strong> $${(data.total / 2).toFixed(2)} (due after completion)</p>
+            <p><strong>Total Amount:</strong> $${data.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p><strong>Initial Payment:</strong> $${(data.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (50% deposit)</p>
+            <p><strong>Remaining Balance:</strong> $${(data.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (due after completion)</p>
           </div>
         </div>
         
@@ -123,15 +123,15 @@ export async function sendAdminNotificationEmail(data: OrderEmailData) {
           ${data.items.map(item => `
             <div style="margin: 10px 0;">
               <p style="margin: 5px 0;">
-                ${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+                ${item.name} - $${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} x ${item.quantity}
               </p>
             </div>
           `).join('')}
           
           <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
-            <p><strong>Total Amount:</strong> $${data.total.toFixed(2)}</p>
-            <p><strong>Initial Payment:</strong> $${(data.total / 2).toFixed(2)}</p>
-            <p><strong>Remaining Balance:</strong> $${(data.total / 2).toFixed(2)}</p>
+            <p><strong>Total Amount:</strong> $${data.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p><strong>Initial Payment:</strong> $${(data.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p><strong>Remaining Balance:</strong> $${(data.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
         </div>
       `,

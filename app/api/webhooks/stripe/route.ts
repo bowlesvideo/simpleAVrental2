@@ -59,7 +59,7 @@ export async function POST(request: Request) {
             orderDate: new Date(),
             eventDate: new Date(), // This should be updated with actual event date from metadata
             total: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
-            status: 'paid',
+            status: 'Deposit Paid',
             items: JSON.stringify(items),
             eventDetails: JSON.stringify({
               paymentIntent: session.payment_intent,

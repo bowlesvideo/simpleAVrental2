@@ -172,7 +172,7 @@ export default function OrderPage({ params }: { params: { orderId: string } }) {
                       </ul>
                     )}
                   </div>
-                  <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
+                  <p className="text-lg font-semibold">${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
               </div>
             ))}
@@ -184,7 +184,7 @@ export default function OrderPage({ params }: { params: { orderId: string } }) {
                 {addons.map((item) => (
                   <div key={item.id} className="flex justify-between items-center py-2">
                     <span className="text-gray-600">{item.name}</span>
-                    <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-semibold">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 ))}
               </div>
@@ -194,15 +194,15 @@ export default function OrderPage({ params }: { params: { orderId: string } }) {
             <div className="border-t pt-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>${order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600 mt-2">
                 <span>50% Payment Due Today:</span>
-                <span>${(order.total / 2).toFixed(2)}</span>
+                <span>${(order.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>50% Due After Completion:</span>
-                <span>${(order.total / 2).toFixed(2)}</span>
+                <span>${(order.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
           </CardContent>
