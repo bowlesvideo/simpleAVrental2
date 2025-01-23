@@ -18,6 +18,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 // Log the Stripe mode for debugging
 console.log('Stripe Mode:', process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_') ? 'live' : 'test')
 
+// Generate order ID
+function generateOrderId() {
+  const now = new Date()
+  const year = now.getFullYear().toString().slice(-2)
+  const month = (now.getMonth() + 1).toString().padStart(2, '0')
+  const day = now.getDate().toString().padStart(2, '0')
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+  return `ORD${year}${month}${day}-${random}`
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -43,6 +53,9 @@ export async function POST(request: Request) {
       }
     })
 
+    // Generate order ID for this session
+    const orderId = generateOrderId()
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -51,6 +64,7 @@ export async function POST(request: Request) {
       success_url: 'https://govideopro.com/confirmation?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: 'https://govideopro.com/cart',
       metadata: {
+        orderId,
         items: JSON.stringify(items)
       }
     })

@@ -42,17 +42,22 @@ export async function POST(request: Request) {
         
         // Parse the items from metadata
         const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
-        
-        // Generate order ID
-        const now = new Date();
-        const orderId = `ORD${now.getFullYear().toString().slice(-2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+        const orderId = session.metadata?.orderId;
 
-        // Create order in database
+        if (!orderId) {
+          console.error('No order ID found in session metadata');
+          return NextResponse.json(
+            { error: 'No order ID found in session metadata' },
+            { status: 400 }
+          );
+        }
+        
+        // Create order in database using the ID from metadata
         const order = await prisma.order.create({
           data: {
             id: orderId,
-            orderDate: now,
-            eventDate: now, // This should be updated with actual event date from metadata
+            orderDate: new Date(),
+            eventDate: new Date(), // This should be updated with actual event date from metadata
             total: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
             status: 'paid',
             items: JSON.stringify(items),
@@ -72,12 +77,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('Error processing webhook:', error);
     return NextResponse.json(
-      { 
-        error: 'Webhook signature verification failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Webhook error' },
       { status: 400 }
     );
   }

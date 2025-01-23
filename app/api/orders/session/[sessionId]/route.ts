@@ -28,7 +28,14 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({ orderId: order.id })
+    // Parse the items from the order's JSON string
+    const items = typeof order.items === 'string' ? JSON.parse(order.items) : []
+
+    return NextResponse.json({
+      orderId: order.id,
+      items,
+      total: order.total
+    })
   } catch (error) {
     console.error('Error fetching order:', error)
     return NextResponse.json(
