@@ -48,8 +48,8 @@ export async function POST(request: Request) {
       line_items: lineItems,
       mode: 'payment',
       billing_address_collection: 'required',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
+      success_url: 'https://govideopro.com/confirmation?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://govideopro.com/cart',
       metadata: {
         items: JSON.stringify(items)
       }
