@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from 'date-fns'
-import { Calendar, Clock, Receipt } from 'lucide-react'
+import { Calendar, Clock, Receipt, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
 interface EventDetails {
@@ -15,12 +15,23 @@ interface EventDetails {
   eventTime: string;
 }
 
+interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  type: 'package' | 'addon';
+  keyFeatures?: { value: string }[];
+}
+
 const ConfirmationContent = () => {
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
   const [eventDetails, setEventDetails] = useState<EventDetails | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([])
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -37,6 +48,10 @@ const ConfirmationContent = () => {
         
         if (response.ok) {
           setOrderId(data.orderId)
+          if (data.items) {
+            setOrderItems(data.items)
+            setTotal(data.total || data.items.reduce((sum: number, item: OrderItem) => sum + (item.price * item.quantity), 0))
+          }
         }
 
         // Get event details from localStorage
@@ -84,6 +99,10 @@ const ConfirmationContent = () => {
       </Card>
     )
   }
+
+  // Separate packages and add-ons
+  const packages = orderItems.filter(item => item.type === 'package')
+  const addons = orderItems.filter(item => item.type === 'addon')
 
   return (
     <div className="space-y-8">
@@ -136,6 +155,61 @@ const ConfirmationContent = () => {
               </div>
             </div>
           )}
+
+          {/* Order Summary Section */}
+          <div className="border rounded-lg p-6 bg-gray-50">
+            <h3 className="font-semibold text-lg mb-4">Order Summary</h3>
+            <div className="space-y-6">
+              {packages.length > 0 && (
+                <section aria-label="Selected packages" className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-500">Packages</h4>
+                  {packages.map((item) => (
+                    <div key={item.id} className="flex justify-between items-center">
+                      <span>{item.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1">{item.quantity}x</span>
+                        <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </section>
+              )}
+              {addons.length > 0 && (
+                <section aria-label="Selected add-ons" className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-500">Add-ons</h4>
+                  {addons.map((item) => (
+                    <div key={item.id} className="flex justify-between items-center">
+                      <span>{item.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1">{item.quantity}x</span>
+                        <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </section>
+              )}
+              <section aria-label="Order total" className="pt-4 border-t">
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>Total</span>
+                  <span>${Math.round(total).toLocaleString()}</span>
+                </div>
+                <div className="mt-2 space-y-1">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <span>50% paid</span>
+                    </div>
+                    <span>${Math.round(total * 0.5).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>50% due on delivery</span>
+                    <span>${Math.round(total * 0.5).toLocaleString()}</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
           <div className="text-center">
             <div className="max-w-2xl mx-auto">
               <p className="text-gray-600 mb-8 text-lg leading-relaxed">
@@ -144,20 +218,15 @@ const ConfirmationContent = () => {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col items-center gap-4 pt-4">
-          <Button asChild className="bg-[#0095ff] text-white hover:bg-[#007acc] px-8 py-6 text-lg rounded-full transition-transform hover:scale-105">
-            <Link href="/">Return to Home</Link>
-          </Button>
+        <CardFooter className="flex flex-col space-y-2 text-center">
+          <div className="text-sm text-gray-500">
+            Order confirmation and details will be sent to your email
+          </div>
+          <div className="text-sm text-gray-400">
+            Reference: #{orderId}
+          </div>
         </CardFooter>
       </Card>
-      <div className="text-center space-y-2">
-        <div className="text-sm text-gray-500">
-          Order confirmation and details will be sent to your email
-        </div>
-        <div className="text-sm text-gray-400">
-          Reference: #{orderId}
-        </div>
-      </div>
     </div>
   )
 }
