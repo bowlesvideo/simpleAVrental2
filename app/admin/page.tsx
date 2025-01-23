@@ -32,10 +32,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { useRouter } from 'next/navigation'
 import { toast } from "@/components/ui/use-toast"
+import { format } from 'date-fns'
 
 interface AddOnGroup {
   id: string;
@@ -176,6 +177,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const router = useRouter();
 
   const sensors = useSensors(
@@ -555,6 +558,25 @@ const AdminPage = () => {
         description: "Failed to trash order",
         variant: "destructive",
       });
+    }
+  };
+
+  const fetchOrderDetails = async (orderId: string) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`);
+      const data = await response.json();
+      
+      // Parse the JSON strings into objects
+      const parsedOrder = {
+        ...data,
+        items: JSON.parse(data.items),
+        eventDetails: JSON.parse(data.eventDetails)
+      };
+      
+      setSelectedOrder(parsedOrder);
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      setError(error instanceof Error ? error.message : 'Failed to fetch order details');
     }
   };
 
@@ -1094,71 +1116,189 @@ const AdminPage = () => {
           {activeSection === 'orders' && (
             <>
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                >
-                  <option value="all">All Orders</option>
-                  <option value="pending">Pending</option>
-                  <option value="trashed">Trashed</option>
-                </select>
+                <div className="flex items-center gap-4">
+                  <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+                  {selectedOrderId && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedOrderId(null);
+                        setSelectedOrder(null);
+                      }}
+                      className="text-sm"
+                    >
+                      ← Back to Orders
+                    </Button>
+                  )}
+                </div>
+                {!selectedOrderId && (
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    <option value="all">All Orders</option>
+                    <option value="pending">Pending</option>
+                    <option value="trashed">Trashed</option>
+                  </select>
+                )}
               </div>
 
               <Card className="p-6">
-                <div className="space-y-4">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3">Order #</th>
-                          <th className="px-4 py-3">Order Date</th>
-                          <th className="px-4 py-3">Event Date</th>
-                          <th className="px-4 py-3">Company</th>
-                          <th className="px-4 py-3">Status</th>
-                          <th className="px-4 py-3 text-right">Total</th>
-                          <th className="px-4 py-3 w-10"></th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {orders
-                          .filter(order => statusFilter === 'all' || order.status === statusFilter)
-                          .map((order) => (
-                          <tr key={order.id} className="bg-white hover:bg-gray-50 group">
-                            <td className="px-4 py-3">{order.id}</td>
-                            <td className="px-4 py-3">{order.orderDate}</td>
-                            <td className="px-4 py-3">{order.eventDate}</td>
-                            <td className="px-4 py-3">{order.companyName}</td>
-                            <td className="px-4 py-3">
-                              <Badge variant="secondary" className={
-                                order.status === 'trashed' ? 'bg-red-100 text-red-800' :
-                                'bg-yellow-100 text-yellow-800'
-                              }>
-                                {order.status}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3 text-right">${order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                            <td className="px-4 py-3">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleTrashOrder(order.id);
-                                }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-red-600"
-                                title="Move to trash"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                </svg>
-                              </button>
-                            </td>
+                {!selectedOrderId ? (
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3">Order #</th>
+                            <th className="px-4 py-3">Order Date</th>
+                            <th className="px-4 py-3">Event Date</th>
+                            <th className="px-4 py-3">Company</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3 text-right">Total</th>
+                            <th className="px-4 py-3 w-10"></th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="divide-y">
+                          {orders
+                            .filter(order => statusFilter === 'all' || order.status === statusFilter)
+                            .map((order) => (
+                            <tr 
+                              key={order.id} 
+                              className="bg-white hover:bg-gray-50 group cursor-pointer"
+                              onClick={() => {
+                                setSelectedOrderId(order.id);
+                                fetchOrderDetails(order.id);
+                              }}
+                            >
+                              <td className="px-4 py-3">{order.id}</td>
+                              <td className="px-4 py-3">{order.orderDate}</td>
+                              <td className="px-4 py-3">{order.eventDate}</td>
+                              <td className="px-4 py-3">{order.companyName}</td>
+                              <td className="px-4 py-3">
+                                <Badge variant="secondary" className={
+                                  order.status === 'trashed' ? 'bg-red-100 text-red-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                                }>
+                                  {order.status}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-3 text-right">${order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTrashOrder(order.id);
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-red-600"
+                                  title="Move to trash"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                ) : selectedOrder ? (
+                  <div className="space-y-8">
+                    {/* Order Details Content */}
+                    <div className="grid grid-cols-2 gap-8">
+                      <Card>
+                        <CardContent className="pt-6">
+                          <h3 className="text-lg font-semibold mb-4">Event Details</h3>
+                          <div className="space-y-2 text-gray-600">
+                            <p><span className="font-medium">Date:</span> {format(new Date(selectedOrder.eventDate), 'MMMM d, yyyy')}</p>
+                            <p><span className="font-medium">Time:</span> {selectedOrder.eventDetails.eventStartTime} to {selectedOrder.eventDetails.eventEndTime}</p>
+                            <p><span className="font-medium">Location:</span> {selectedOrder.eventDetails.eventLocation}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardContent className="pt-6">
+                          <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
+                          <div className="space-y-2 text-gray-600">
+                            <p><span className="font-medium">Company:</span> {selectedOrder.eventDetails.companyName}</p>
+                            <p><span className="font-medium">Contact:</span> {selectedOrder.eventDetails.contactName}</p>
+                            <p><span className="font-medium">Email:</span> {selectedOrder.eventDetails.contactEmail}</p>
+                            <p><span className="font-medium">Phone:</span> {selectedOrder.eventDetails.contactPhone}</p>
+                            <p><span className="font-medium">Address:</span><br />
+                              {selectedOrder.eventDetails.street}<br />
+                              {selectedOrder.eventDetails.city}, {selectedOrder.eventDetails.state} {selectedOrder.eventDetails.zip}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Order Items */}
+                    <Card>
+                      <CardContent className="pt-6">
+                        <h3 className="text-lg font-semibold mb-4">Order Details</h3>
+                        
+                        {/* Packages */}
+                        {selectedOrder.items
+                          .filter((item: any) => item.type === 'package')
+                          .map((item: any) => (
+                          <div key={item.id} className="mb-6 pb-6 border-b">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="text-lg font-semibold text-[#0095ff]">{item.name}</h4>
+                                {item.keyFeatures && (
+                                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                                    {item.keyFeatures.map((feature: any, index: number) => (
+                                      <li key={index}>• {feature.value}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                              <p className="text-lg font-semibold">${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Add-ons */}
+                        {selectedOrder.items.filter((item: any) => item.type === 'addon').length > 0 && (
+                          <div className="mb-6">
+                            <h4 className="text-lg font-semibold mb-4">Add-ons</h4>
+                            {selectedOrder.items
+                              .filter((item: any) => item.type === 'addon')
+                              .map((item: any) => (
+                              <div key={item.id} className="flex justify-between items-center py-2">
+                                <span className="text-gray-600">{item.name}</span>
+                                <span className="font-semibold">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Total */}
+                        <div className="border-t pt-4">
+                          <div className="flex justify-between font-bold text-lg">
+                            <span>Total:</span>
+                            <span>${selectedOrder.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-600 mt-2">
+                            <span>50% Payment Due Today:</span>
+                            <span>${(selectedOrder.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>50% Due After Completion:</span>
+                            <span>${(selectedOrder.total / 2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">Loading order details...</div>
+                )}
               </Card>
             </>
           )}
