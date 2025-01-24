@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { sendAdminNotificationEmail, sendCustomerConfirmationEmail } from '@/lib/email-service';
 
-export async function GET() {
+// Only allow POST requests
+export async function POST(request: Request) {
   try {
+    // Check for development environment
+    if (process.env.NODE_ENV !== 'development') {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Test emails can only be sent in development environment' 
+      }, { status: 403 });
+    }
+
     const testData = {
       orderNumber: 'TEST-001',
       customerName: 'Test Customer',
@@ -14,7 +23,8 @@ export async function GET() {
         {
           name: 'Test Package',
           price: 1000,
-          quantity: 1
+          quantity: 1,
+          type: 'package'
         }
       ],
       eventDetails: {
