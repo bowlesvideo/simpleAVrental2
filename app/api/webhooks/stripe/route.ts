@@ -3,6 +3,8 @@ import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { generateOrderId } from '@/lib/utils';
+import { sendCustomerConfirmationEmail, sendAdminNotificationEmail } from '@/lib/email-service';
+import { format } from 'date-fns';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set');
@@ -71,6 +73,36 @@ export async function POST(request: Request) {
         });
 
         console.log('Order created:', order);
+
+        // Send confirmation emails
+        try {
+          const emailData = {
+            orderNumber: order.id,
+            customerName: session.customer_details?.name || '',
+            customerEmail: session.customer_details?.email || '',
+            eventDate: format(new Date(eventDetails.eventDate), 'yyyy-MM-dd'),
+            eventTime: `${eventDetails.eventStartTime} - ${eventDetails.eventEndTime}`,
+            total: order.total,
+            items: items,
+            eventDetails: {
+              ...eventDetails,
+              customerName: session.customer_details?.name,
+              customerEmail: session.customer_details?.email,
+              customerPhone: session.customer_details?.phone,
+            }
+          };
+
+          await Promise.all([
+            sendCustomerConfirmationEmail(emailData),
+            sendAdminNotificationEmail(emailData)
+          ]);
+
+          console.log('Confirmation emails sent successfully');
+        } catch (emailError) {
+          console.error('Error sending confirmation emails:', emailError);
+          // Don't throw the error as we still want to acknowledge the webhook
+        }
+
         break;
       }
       // Add other event types as needed
