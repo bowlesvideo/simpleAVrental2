@@ -43,21 +43,28 @@ export async function POST(request: Request) {
         
         // Parse the items from metadata
         const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
-        const orderId = generateOrderId();
+        const orderId = session.metadata?.orderId || generateOrderId();
+
+        // Get event details from session storage
+        const eventDetails = session.metadata?.eventDetails ? 
+          JSON.parse(session.metadata.eventDetails) : {};
 
         // Create order in database using our generated ID
         const order = await prisma.order.create({
           data: {
             id: orderId,
             orderDate: new Date(),
-            eventDate: new Date(), // This should be updated with actual event date from metadata
+            eventDate: eventDetails.eventDate ? new Date(eventDetails.eventDate) : new Date(),
             total: session.amount_total ? session.amount_total / 100 : 0, // Convert from cents
             status: 'Deposit Paid',
             items: JSON.stringify(items),
             eventDetails: JSON.stringify({
+              ...eventDetails,
               paymentIntent: session.payment_intent,
               customerEmail: session.customer_details?.email,
               customerName: session.customer_details?.name,
+              billingAddress: session.customer_details?.address,
+              phone: session.customer_details?.phone,
             }),
             updatedAt: new Date()
           }

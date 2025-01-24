@@ -31,7 +31,7 @@ function generateOrderId() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { items } = body
+    const { items, eventDetails } = body
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       cancel_url: 'https://govideopro.com/cart',
       metadata: {
         orderId,
-        items: JSON.stringify(items)
+        items: JSON.stringify(items),
+        eventDetails: JSON.stringify(eventDetails)
       }
     })
 
