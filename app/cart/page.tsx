@@ -226,10 +226,63 @@ export default function CartPage() {
 
   console.log('Packages:', packages);
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3))
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
+  const nextStep = () => {
+    const currentStep = step
+    const newStep = Math.min(currentStep + 1, 3)
+    setStep(newStep)
+    
+    // Send GA event for checkout steps
+    const gtag = (window as any).gtag
+    if (typeof gtag !== 'undefined') {
+      if (currentStep === 1) {
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          value: total,
+          items: items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: item.type === 'package' ? 'Package' : 'Add-on',
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+      } else if (currentStep === 2) {
+        gtag('event', 'add_shipping_info', {
+          currency: 'USD',
+          value: total,
+          items: items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: item.type === 'package' ? 'Package' : 'Add-on',
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+      }
+    }
+  }
 
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
+  
   const isContactDetailsValid = companyName && contactName && contactEmail
+
+  // Add view_cart event when component mounts
+  useEffect(() => {
+    const gtag = (window as any).gtag
+    if (typeof gtag !== 'undefined' && items.length > 0) {
+      gtag('event', 'view_cart', {
+        currency: 'USD',
+        value: total,
+        items: items.map(item => ({
+          item_id: item.id,
+          item_name: item.name,
+          item_category: item.type === 'package' ? 'Package' : 'Add-on',
+          price: item.price,
+          quantity: item.quantity
+        }))
+      });
+    }
+  }, [items, total]);
 
   const handleCheckout = async () => {
     try {
@@ -242,6 +295,22 @@ export default function CartPage() {
         sessionStorage.setItem('pending_event_details', savedEventDetails)
       }
       
+      // Send GA begin_checkout event before redirecting to Stripe
+      const gtag = (window as any).gtag
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          value: total,
+          items: items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: item.type === 'package' ? 'Package' : 'Add-on',
+            price: item.price,
+            quantity: item.quantity
+          }))
+        });
+      }
+
       // Create a checkout session with 50% of the total price
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
@@ -309,11 +378,11 @@ export default function CartPage() {
   }
 
   const handleNextStep = () => {
-    if (isContactDetailsValid) {
-      nextStep()
-    } else {
+    if (step === 2 && !isContactDetailsValid) {
       setShowErrors(true)
+      return
     }
+    nextStep()
   }
 
   const handleStepClick = (targetStep: number) => {

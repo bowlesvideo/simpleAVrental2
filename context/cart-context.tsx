@@ -52,6 +52,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (exists) {
         return currentItems
       }
+      // Send GA event
+      const gtag = (window as any).gtag
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'add_to_cart', {
+          currency: 'USD',
+          value: pkg.price,
+          items: [{
+            item_id: pkg.id,
+            item_name: pkg.name,
+            item_category: 'Package',
+            price: pkg.price,
+            quantity: 1
+          }]
+        });
+      }
       return [...currentItems, {
         type: 'package',
         id: pkg.id,
@@ -67,11 +82,41 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems(currentItems => {
       const exists = currentItems.find(item => item.id === addon.id)
       if (exists) {
+        // Send GA event for quantity increase
+        const gtag = (window as any).gtag
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'add_to_cart', {
+            currency: 'USD',
+            value: addon.price,
+            items: [{
+              item_id: addon.id,
+              item_name: addon.name,
+              item_category: 'Add-on',
+              price: addon.price,
+              quantity: 1
+            }]
+          });
+        }
         return currentItems.map(item =>
           item.id === addon.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
+      }
+      // Send GA event for new addon
+      const gtag = (window as any).gtag
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'add_to_cart', {
+          currency: 'USD',
+          value: addon.price,
+          items: [{
+            item_id: addon.id,
+            item_name: addon.name,
+            item_category: 'Add-on',
+            price: addon.price,
+            quantity: 1
+          }]
+        });
       }
       return [...currentItems, {
         type: 'addon',
@@ -84,7 +129,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const removeItem = useCallback((id: string) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== id))
+    setItems(currentItems => {
+      const item = currentItems.find(item => item.id === id)
+      if (item) {
+        // Send GA remove_from_cart event
+        const gtag = (window as any).gtag
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'remove_from_cart', {
+            currency: 'USD',
+            value: item.price * item.quantity,
+            items: [{
+              item_id: item.id,
+              item_name: item.name,
+              item_category: item.type === 'package' ? 'Package' : 'Add-on',
+              price: item.price,
+              quantity: item.quantity
+            }]
+          });
+        }
+      }
+      return currentItems.filter(item => item.id !== id)
+    })
   }, [])
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
