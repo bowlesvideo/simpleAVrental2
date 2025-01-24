@@ -22,9 +22,9 @@ interface EventDetails {
   eventEndTime: string
   eventLocation: string
   companyName: string
-  contactName: string
-  contactEmail: string
-  contactPhone: string
+  customerName: string
+  customerEmail: string
+  customerPhone: string
   street: string
   city: string
   state: string
@@ -141,9 +141,9 @@ export default function OrderPage({ params }: { params: { orderId: string } }) {
               <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
               <div className="space-y-2 text-gray-600">
                 <p><span className="font-medium">Company:</span> {order.eventDetails.companyName}</p>
-                <p><span className="font-medium">Contact:</span> {order.eventDetails.contactName}</p>
-                <p><span className="font-medium">Email:</span> {order.eventDetails.contactEmail}</p>
-                <p><span className="font-medium">Phone:</span> {order.eventDetails.contactPhone}</p>
+                <p><span className="font-medium">Name:</span> {order.eventDetails.customerName}</p>
+                <p><span className="font-medium">Email:</span> {order.eventDetails.customerEmail}</p>
+                <p><span className="font-medium">Phone:</span> {order.eventDetails.customerPhone}</p>
                 <p><span className="font-medium">Address:</span><br />
                   {order.eventDetails.street}<br />
                   {order.eventDetails.city}, {order.eventDetails.state} {order.eventDetails.zip}

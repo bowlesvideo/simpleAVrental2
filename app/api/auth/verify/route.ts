@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { createHash } from 'crypto'
 
+export const dynamic = 'force-dynamic'
+
 // Hash the token for verification
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')

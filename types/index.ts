@@ -11,8 +11,13 @@ export interface EventDetails {
   eventEndTime: string;
   eventLocation: string;
   companyName: string;
-  contactName: string;
-  contactEmail: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  street?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
 }
 
 export interface OrderDetails {

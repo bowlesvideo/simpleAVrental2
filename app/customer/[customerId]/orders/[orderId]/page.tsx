@@ -26,9 +26,9 @@ interface OrderDetails {
     eventEndTime: string;
     eventLocation: string;
     companyName: string;
-    contactName: string;
-    contactEmail: string;
-    contactPhone?: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
     city: string;
     state: string;
     zip: string;
@@ -134,8 +134,8 @@ export default async function OrderDetailsPage({
                 <div className="flex items-start gap-3">
                   <User className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
-                    <p className="font-medium">Contact Name</p>
-                    <p className="text-gray-600">{orderDetails.eventDetails.contactName}</p>
+                    <p className="font-medium">Name</p>
+                    <p className="text-gray-600">{orderDetails.eventDetails.customerName}</p>
                   </div>
                 </div>
 
@@ -143,16 +143,16 @@ export default async function OrderDetailsPage({
                   <Mail className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <p className="text-gray-600">{orderDetails.eventDetails.contactEmail}</p>
+                    <p className="text-gray-600">{orderDetails.eventDetails.customerEmail}</p>
                   </div>
                 </div>
 
-                {orderDetails.eventDetails.contactPhone && (
+                {orderDetails.eventDetails.customerPhone && (
                   <div className="flex items-start gap-3">
                     <Phone className="w-5 h-5 text-blue-500 mt-0.5" />
                     <div>
                       <p className="font-medium">Phone</p>
-                      <p className="text-gray-600">{orderDetails.eventDetails.contactPhone}</p>
+                      <p className="text-gray-600">{orderDetails.eventDetails.customerPhone}</p>
                     </div>
                   </div>
                 )}

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
               customerEmail: session.customer_details?.email,
               customerName: session.customer_details?.name,
               billingAddress: session.customer_details?.address,
-              phone: session.customer_details?.phone,
+              customerPhone: session.customer_details?.phone,
             }),
             updatedAt: new Date()
           }

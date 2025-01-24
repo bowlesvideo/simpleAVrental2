@@ -1299,9 +1299,9 @@ const AdminPage = () => {
                           <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
                           <div className="space-y-2 text-gray-600">
                             <p><span className="font-medium">Company:</span> {selectedOrder.eventDetails.companyName}</p>
-                            <p><span className="font-medium">Contact:</span> {selectedOrder.eventDetails.contactName}</p>
-                            <p><span className="font-medium">Email:</span> {selectedOrder.eventDetails.contactEmail}</p>
-                            <p><span className="font-medium">Phone:</span> {selectedOrder.eventDetails.contactPhone}</p>
+                            <p><span className="font-medium">Name:</span> {selectedOrder.eventDetails.customerName}</p>
+                            <p><span className="font-medium">Email:</span> {selectedOrder.eventDetails.customerEmail}</p>
+                            <p><span className="font-medium">Phone:</span> {selectedOrder.eventDetails.customerPhone}</p>
                             <p><span className="font-medium">Address:</span><br />
                               {selectedOrder.eventDetails.street}<br />
                               {selectedOrder.eventDetails.city}, {selectedOrder.eventDetails.state} {selectedOrder.eventDetails.zip}
