@@ -202,7 +202,7 @@ export function HomeContent() {
         additionalSchema={structuredData}
       />
       <main className="min-h-screen bg-[#072948] py-6" role="main">
-        <header className="py-8 bg-[#072948]">
+        <header className="pt-16 pb-8 bg-[#072948]">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center mb-4">
               <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white tracking-tight">
@@ -232,7 +232,7 @@ export function HomeContent() {
         </section>
 
         <section 
-          className="py-16 bg-gradient-to-b from-[#0d3b66] to-[#072948]" 
+          className="py-16 bg-white" 
           aria-labelledby="experience-heading"
           itemScope 
           itemType="https://schema.org/Organization"
@@ -241,13 +241,13 @@ export function HomeContent() {
             <div className="max-w-4xl mx-auto text-center mb-12">
               <h2 
                 id="experience-heading" 
-                className="text-3xl sm:text-4xl font-bold text-white mb-6"
+                className="text-3xl sm:text-4xl font-bold text-[#072948] mb-6"
                 itemProp="slogan"
               >
                 Over 20 Years of Professional Experience
               </h2>
               <p 
-                className="text-lg text-gray-200 mb-8"
+                className="text-lg text-gray-600 mb-8"
                 itemProp="description"
               >
                 From broadcast studios to corporate boardrooms, we bring decades of expertise to every project.
@@ -260,7 +260,7 @@ export function HomeContent() {
               aria-label="Our expertise areas"
             >
               <div 
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center"
+                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
@@ -271,14 +271,14 @@ export function HomeContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2" itemProp="name">Broadcast Production</h3>
-                <p className="text-gray-300" itemProp="description">
+                <h3 className="text-xl font-bold text-[#072948] mb-2" itemProp="name">Broadcast Production</h3>
+                <p className="text-gray-600" itemProp="description">
                   Studio-quality production values from our experienced broadcast team.
                 </p>
               </div>
 
               <div 
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center"
+                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
@@ -289,14 +289,14 @@ export function HomeContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2" itemProp="name">Corporate Events</h3>
-                <p className="text-gray-300" itemProp="description">
+                <h3 className="text-xl font-bold text-[#072948] mb-2" itemProp="name">Corporate Events</h3>
+                <p className="text-gray-600" itemProp="description">
                   Thousands of successful corporate events delivered flawlessly.
                 </p>
               </div>
 
               <div 
-                className="bg-white/5 backdrop-blur-sm rounded-xl p-6 text-center"
+                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
@@ -307,8 +307,8 @@ export function HomeContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2" itemProp="name">Commercial Production</h3>
-                <p className="text-gray-300" itemProp="description">
+                <h3 className="text-xl font-bold text-[#072948] mb-2" itemProp="name">Commercial Production</h3>
+                <p className="text-gray-600" itemProp="description">
                   High-impact video content for marketing and communications.
                 </p>
               </div>
@@ -316,14 +316,14 @@ export function HomeContent() {
           </div>
         </section>
 
-        <section className="py-24 bg-gradient-to-b from-[#0d3b66] to-[#072948]" aria-labelledby="process-heading">
+        <section className="py-24 bg-white border-t border-gray-100" aria-labelledby="process-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-center text-white mb-20">
+            <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-center text-[#072948] mb-20">
               Guided Event Experience
             </h2>
             
             <div className="relative max-w-5xl mx-auto px-4">
-              <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-[#0095ff] -translate-y-1/2 opacity-50" aria-hidden="true"></div>
+              <div className="absolute top-[60px] left-8 right-8 h-0.5 bg-[#0095ff] -translate-y-1/2" aria-hidden="true"></div>
               
               <ol className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-12 sm:gap-6 relative">
                 {[
@@ -334,13 +334,15 @@ export function HomeContent() {
                   { step: 5, title: 'Next Day', desc: 'Receive your edited video files via secure Dropbox link' }
                 ].map(({ step, title, desc }) => (
                   <li key={step} className="text-center relative">
-                    <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-[#0095ff] text-white font-bold text-lg flex items-center justify-center mx-auto mb-6 shadow-lg transform transition-transform hover:scale-110 duration-300" aria-hidden="true">
+                    <div className="relative bg-white py-2">
+                      <div className="w-12 h-12 rounded-full bg-[#0095ff] text-white font-bold text-lg flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-110 duration-300" aria-hidden="true">
                         {step}
                       </div>
                     </div>
-                    <h3 className="text-white font-semibold text-lg mb-3">{title}</h3>
-                    <p className="text-gray-300 leading-relaxed">{desc}</p>
+                    <div className="mt-8">
+                      <h3 className="text-[#072948] font-semibold text-lg mb-3">{title}</h3>
+                      <p className="text-gray-600 leading-relaxed">{desc}</p>
+                    </div>
                   </li>
                 ))}
               </ol>
