@@ -3,270 +3,215 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('Seeding database...')
+  // Create rental configuration
+  await prisma.rentalConfig.upsert({
+    where: { id: 'default' },
+    update: {},
+    create: {
+      id: 'default',
+      packages: [
+        {
+          id: 'meeting-package',
+          name: 'Meeting Package',
+          price: 2500,
+          description: 'Perfect for corporate meetings and presentations',
+          image: '/images/meeting-package.jpg',
+          keyFeatures: [
+            'Professional HD Camera',
+            'Audio System',
+            'Basic Lighting Kit',
+            'Technical Support'
+          ],
+          includes: [
+            'Camera Operator',
+            'Audio Technician',
+            'Basic Post-Production',
+            'Digital File Delivery'
+          ]
+        },
+        {
+          id: 'webinar-package',
+          name: 'Webinar Package',
+          price: 3000,
+          description: 'Ideal for virtual events and online presentations',
+          image: '/images/webinar-package.jpg',
+          keyFeatures: [
+            'Multi-Camera Setup',
+            'Professional Audio System',
+            'Streaming Equipment',
+            'Technical Support'
+          ],
+          includes: [
+            'Camera Operators',
+            'Audio Engineer',
+            'Streaming Technician',
+            'Digital Recording'
+          ]
+        },
+        {
+          id: 'training-package',
+          name: 'Training Package',
+          price: 3500,
+          description: 'Comprehensive setup for training sessions and workshops',
+          image: '/images/training-package.jpg',
+          keyFeatures: [
+            'Multi-Camera Setup',
+            'Wireless Microphones',
+            'Professional Lighting',
+            'Technical Support'
+          ],
+          includes: [
+            'Camera Operators',
+            'Audio Engineer',
+            'Lighting Technician',
+            'Post-Production Editing'
+          ]
+        }
+      ],
+      addOns: [
+        {
+          id: 'additional-camera',
+          name: 'Additional Camera',
+          price: 500,
+          description: 'Add an extra camera for multiple angles'
+        },
+        {
+          id: 'streaming-service',
+          name: 'Live Streaming Service',
+          price: 750,
+          description: 'Professional streaming to your platform of choice'
+        },
+        {
+          id: 'graphics-package',
+          name: 'Graphics Package',
+          price: 400,
+          description: 'Custom lower thirds and on-screen graphics'
+        },
+        {
+          id: 'audio-recording',
+          name: 'Professional Audio Recording',
+          price: 300,
+          description: 'High-quality audio recording and mixing'
+        },
+        {
+          id: 'lighting-kit',
+          name: 'Additional Lighting Kit',
+          price: 250,
+          description: 'Extra lighting for enhanced video quality'
+        }
+      ],
+      keyFeatures: [],
+      addonGroups: [
+        {
+          id: 'recording-streaming',
+          label: 'Recording & Streaming'
+        },
+        {
+          id: 'production-enhancements',
+          label: 'Production Enhancements'
+        }
+      ]
+    }
+  })
 
-  try {
-    // Create or update the rental configuration
-    const rentalConfig = await prisma.rentalConfig.upsert({
-      where: { id: 'default' },
-      update: {
-        packages: [
+  // Create a customer
+  const customer = await prisma.customer.upsert({
+    where: { email: 'stephen@bowlescreative.com' },
+    update: {},
+    create: {
+      email: 'stephen@bowlescreative.com',
+      orders: {
+        create: [
           {
-            id: 'meeting',
-            name: 'Meeting Package',
-            description: 'Perfect for corporate meetings and presentations. Includes professional video recording and live streaming setup.',
-            price: 2500,
-            slug: 'meeting-package',
-            image: '/images/seminar-meeting-doctor-conference-presentation-edu-2024-10-18-05-11-57-utc.webp',
-            additionalImages: [
-              '/images/rear-side-of-video-cameraman-taking-photograph-to-2024-10-18-15-42-07-utc.webp',
-              '/images/plot-trainingroom.jpg',
-              '/images/entrepreneur-showing-document-with-infographics-du-2024-11-07-15-14-37-utc.webp',
-              '/images/capturing-corporate-dynamics-videographer-films-b-2025-01-15-16-20-47-utc.webp'
+            orderDate: new Date('2024-01-10'),
+            eventDate: new Date('2024-02-10'),
+            total: 3500,
+            status: 'completed',
+            updatedAt: new Date(),
+            items: [
+              {
+                id: 'training-package',
+                name: 'Training Package',
+                price: 3500,
+                quantity: 1,
+                type: 'package'
+              }
             ],
-            keyFeatures: [
-              { icon: 'video', value: '2 Professional 4K Cameras' },
-              { icon: 'microphone', value: '4 Wireless Microphones' },
-              { icon: 'stream', value: 'Live Streaming to 1 Platform' },
-              { icon: 'clock', value: 'Next Day Video Delivery' }
-            ],
-            includedItems: [
-              'Professional camera operators',
-              'Audio technician',
-              'Basic lighting setup',
-              'All necessary cables and equipment',
-              'Video editing and color correction',
-              'Secure online delivery'
-            ]
+            eventDetails: {
+              eventStartTime: '9:00 AM',
+              eventEndTime: '5:00 PM',
+              eventLocation: '123 Business Center',
+              city: 'Orlando',
+              state: 'FL',
+              zip: '32801',
+              companyName: 'Tech Training Co',
+              contactName: 'Stephen Bowles',
+              contactEmail: 'stephen@bowlescreative.com',
+              contactPhone: '555-0123'
+            }
           },
           {
-            id: 'webinar',
-            name: 'Webinar Package',
-            description: 'Perfect for online presentations and webinars. Includes professional video recording and streaming setup with enhanced audio.',
-            price: 3000,
-            slug: 'webinar-package',
-            image: '/images/young-man-conducting-a-webinar-2025-01-10-03-41-38-utc.webp',
-            additionalImages: [
-              '/images/photodune-uJccmqpY-beauty-blogger-testing-liquid-lipstick-xxl.webp',
-              '/images/plot-trainingroom.jpg',
-              '/images/digital-camera-near-blurred-brunette-broadcaster-i-2024-11-14-12-28-21-utc.webp',
-              '/images/capturing-corporate-dynamics-videographer-films-b-2025-01-15-16-20-47-utc.webp'
+            orderDate: new Date('2024-01-15'),
+            eventDate: new Date('2024-02-15'),
+            total: 2500,
+            status: 'confirmed',
+            updatedAt: new Date(),
+            items: [
+              {
+                id: 'meeting-package',
+                name: 'Meeting Package',
+                price: 2500,
+                quantity: 1,
+                type: 'package'
+              }
             ],
-            keyFeatures: [
-              { icon: 'video', value: '3 Professional 4K Cameras' },
-              { icon: 'microphone', value: '6 Wireless Microphones' },
-              { icon: 'stream', value: 'Multi-Platform Streaming' },
-              { icon: 'clock', value: 'Next Day Video Delivery' }
-            ],
-            includedItems: [
-              'Professional camera operators',
-              'Dedicated streaming technician',
-              'Enhanced lighting setup',
-              'Backup internet connection',
-              'Video editing and color correction',
-              'Secure online delivery'
-            ]
+            eventDetails: {
+              eventStartTime: '10:00 AM',
+              eventEndTime: '2:00 PM',
+              eventLocation: '456 Conference Center',
+              city: 'Orlando',
+              state: 'FL',
+              zip: '32803',
+              companyName: 'Business Solutions Inc',
+              contactName: 'Stephen Bowles',
+              contactEmail: 'stephen@bowlescreative.com',
+              contactPhone: '555-0123'
+            }
           },
           {
-            id: 'training',
-            name: 'Training Package',
-            description: 'Perfect for training sessions and workshops. Includes multi-camera setup and enhanced audio recording.',
-            price: 3500,
-            slug: 'training-package',
-            image: '/images/plot-trainingroom.jpg',
-            additionalImages: [
-              '/images/photodune-TJVPpoZn-film-director-discussing-movie-plan-with-the-actors-xxl.webp',
-              '/images/plot-trainingroom.jpg',
-              '/images/capturing-corporate-dynamics-videographer-films-b-2025-01-15-16-20-47-utc.webp',
-              '/images/photodune-fTidFrK6-videographer-editing-video-project-putting-on-headphones-l.webp'
+            orderDate: new Date('2024-01-20'),
+            eventDate: new Date('2024-04-10'),
+            total: 3000,
+            status: 'pending',
+            updatedAt: new Date(),
+            items: [
+              {
+                id: 'webinar-package',
+                name: 'Webinar Package',
+                price: 3000,
+                quantity: 1,
+                type: 'package'
+              }
             ],
-            keyFeatures: [
-              { icon: 'video', value: '4 Professional 4K Cameras' },
-              { icon: 'microphone', value: '8 Wireless Microphones' },
-              { icon: 'stream', value: 'Multi-Platform Streaming' },
-              { icon: 'clock', value: 'Next Day Video Delivery' }
-            ],
-            includedItems: [
-              'Professional camera operators',
-              'Dedicated audio engineer',
-              'Complete lighting setup',
-              'Multiple viewing angles',
-              'Video editing and color correction',
-              'Secure online delivery'
-            ]
-          },
-          {
-            id: 'townhall',
-            name: 'Town Hall Package',
-            description: 'Perfect for large corporate events and town halls. Includes multi-camera setup, professional audio, and streaming.',
-            price: 4500,
-            slug: 'townhall-package',
-            image: '/images/photodune-84EXm37G-conference-hall-convention-center-with-podium-professional-meeting-summit-xl.webp',
-            additionalImages: [
-              '/images/rear-view-of-audience-over-the-speakers-on-the-sta-2024-10-18-16-00-17-utc.webp',
-              '/images/plot-trainingroom.jpg',
-              '/images/photodune-jppY69UU-camera-show-viewfinder-image-catch-motion-in-interview-or-broadcast-wedding-ceremony--xxl.webp',
-              '/images/photodune-EThOzZun-camera-show-viewfinder-image-catch-model-motion-catch-feeling-stopped-motion--xxl.webp'
-            ],
-            keyFeatures: [
-              { icon: 'video', value: '5 Professional 4K Cameras' },
-              { icon: 'microphone', value: '12 Wireless Microphones' },
-              { icon: 'stream', value: 'Multi-Platform Streaming' },
-              { icon: 'clock', value: 'Next Day Video Delivery' }
-            ],
-            includedItems: [
-              'Professional camera operators',
-              'Full audio team',
-              'Complete lighting setup',
-              'Multiple viewing angles',
-              'Video editing and color correction',
-              'Secure online delivery'
-            ]
+            eventDetails: {
+              eventStartTime: '1:00 PM',
+              eventEndTime: '4:00 PM',
+              eventLocation: '789 Innovation Hub',
+              city: 'Orlando',
+              state: 'FL',
+              zip: '32806',
+              companyName: 'Digital Events LLC',
+              contactName: 'Stephen Bowles',
+              contactEmail: 'stephen@bowlescreative.com',
+              contactPhone: '555-0123'
+            }
           }
-        ],
-        addOns: [
-          {
-            id: 'addon_camera',
-            name: '+1 Camera Angle',
-            value: 'recording-streaming',
-            price: 800,
-            image: '/images/addon-camera.jpg',
-            description: 'Add another 4K Ultra HD camera angle with dedicated operator (as needed). ',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon_streaming',
-            name: 'Additional Streaming Destination',
-            value: 'recording-streaming',
-            price: 300,
-            image: '/images/addon-streaming.jpg',
-            description: 'Add another streaming destination for extended audiences and or backup systems.',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon_graphics',
-            name: 'Slides Operator',
-            value: 'production-enhancements',
-            price: 800,
-            image: '/images/addon-graphics.jpg',
-            description: 'Operator for your presentation slides including collecting, organizing and operating. ',
-            packages: ['meeting', 'training', 'webinar', 'townhall']
-          },
-          {
-            id: 'addon_teleprompter',
-            name: 'Teleprompter',
-            value: 'production-enhancements',
-            price: 800,
-            image: '/images/addon-teleprompter.jpg',
-            description: 'Professional teleprompter with operator and remote control',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon_audio',
-            name: '+4 Wireless Microphones',
-            value: 'recording-streaming',
-            price: 500,
-            image: '/images/addon-audio.jpg',
-            description: 'Additional wireless mics (headsets, Lavs or Hand Helds)',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon_lighting',
-            name: 'Presenter Lighting Package',
-            value: 'recording-streaming',
-            price: 500,
-            image: '/images/addon-lighting.jpg',
-            description: 'Additional LED lighting kit to light the presenter area appropriately for video.',
-            packages: ['webinar', 'meeting', 'townhall', 'training']
-          },
-          {
-            id: 'addon_recording',
-            name: 'Individual Camera Recordings',
-            value: 'delivery-options',
-            price: 400,
-            image: '/images/addon-recording.jpg',
-            description: 'Individual (ISO) recordings from all cameras. ',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon_rush',
-            name: 'Rush Video Edit Delivery',
-            value: 'delivery-options',
-            price: 900,
-            image: '/images/addon-rush.jpg',
-            description: 'Next-day edited video delivery for any package',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon-1737474836317',
-            name: 'HD Projector & Screen',
-            value: 'recording-streaming',
-            price: 1000,
-            description: 'Indoor HD projector & projection screen for medium size rooms. ',
-            image: '',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          },
-          {
-            id: 'addon-1737485397292',
-            name: 'Audience PA Speakers',
-            value: 'recording-streaming',
-            price: 500,
-            description: 'Large speakers on speaker stands for in room audio. ',
-            image: '',
-            packages: ['townhall', 'training', 'webinar', 'meeting']
-          },
-          {
-            id: 'addon-1737486966727',
-            name: 'Event Producer',
-            value: 'production-enhancements',
-            price: 1000,
-            description: 'An assigned producer who helps your team prepare for the event and is there on show day to ensure everything goes smoothly.',
-            image: '',
-            packages: ['meeting', 'webinar', 'training', 'townhall']
-          }
-        ],
-        keyFeatures: [],
-        addonGroups: [
-          {
-            id: 'recording-streaming',
-            label: 'Recording & Streaming'
-          },
-          {
-            id: 'equipment-staff',
-            label: 'Equipment & Staff'
-          },
-          {
-            id: 'production-enhancements',
-            label: 'Production Enhancements'
-          },
-          {
-            id: 'delivery-options',
-            label: 'Delivery Options'
-          }
-        ]
-      },
-      create: {
-        id: 'default',
-        packages: [
-          // Same as update packages array above
-        ],
-        addOns: [
-          // Same as update addOns array above
-        ],
-        keyFeatures: [],
-        addonGroups: [
-          // Same as update addonGroups array above
         ]
       }
-    })
+    }
+  })
 
-    console.log('Database has been seeded. 🌱')
-  } catch (error) {
-    console.error('Error seeding database:', error)
-    throw error
-  } finally {
-    await prisma.$disconnect()
-  }
+  console.log('Database seeded successfully')
 }
 
 main()

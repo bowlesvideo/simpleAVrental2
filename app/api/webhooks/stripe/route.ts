@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
+import { generateOrderId } from '@/lib/utils';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set');
@@ -42,17 +43,9 @@ export async function POST(request: Request) {
         
         // Parse the items from metadata
         const items = session.metadata?.items ? JSON.parse(session.metadata.items) : [];
-        const orderId = session.metadata?.orderId;
+        const orderId = generateOrderId();
 
-        if (!orderId) {
-          console.error('No order ID found in session metadata');
-          return NextResponse.json(
-            { error: 'No order ID found in session metadata' },
-            { status: 400 }
-          );
-        }
-        
-        // Create order in database using the ID from metadata
+        // Create order in database using our generated ID
         const order = await prisma.order.create({
           data: {
             id: orderId,

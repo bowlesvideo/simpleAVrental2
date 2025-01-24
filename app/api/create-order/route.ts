@@ -3,15 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { sendCustomerConfirmationEmail, sendAdminNotificationEmail } from '@/lib/email-service'
 import { format } from 'date-fns'
 import { testConnection } from '@/lib/db-test'
-
-function generateOrderId() {
-  const now = new Date()
-  const year = now.getFullYear().toString().slice(-2)
-  const month = (now.getMonth() + 1).toString().padStart(2, '0')
-  const day = now.getDate().toString().padStart(2, '0')
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-  return `ORD${year}${month}${day}-${random}`
-}
+import { generateOrderId } from '@/lib/utils'
 
 export async function POST(request: Request) {
   // Add CORS headers

@@ -18,8 +18,10 @@ if (!ADMIN_EMAIL) {
 }
 
 if (!FROM_EMAIL) {
-  console.error('FROM_EMAIL is not set in environment variables');
+  console.error('FROM_EMAIL is not set in environment variables. Using default: orders@govideopro.com');
 }
+
+const FROM_EMAIL_DEFAULT = 'Go Video Pro <orders@govideopro.com>';
 
 interface OrderEmailData {
   orderNumber: string;
@@ -64,7 +66,7 @@ export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
     };
 
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL || FROM_EMAIL_DEFAULT,
       to: data.customerEmail,
       subject: `Order Confirmation - ${data.orderNumber}`,
       html: `
@@ -228,7 +230,7 @@ export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
 export async function sendAdminNotificationEmail(data: OrderEmailData) {
   try {
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL || FROM_EMAIL_DEFAULT,
       to: ADMIN_EMAIL,
       subject: `New Order Received - ${data.orderNumber}`,
       html: `
@@ -273,7 +275,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
   try {
     // Send notification to admin
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL || FROM_EMAIL_DEFAULT,
       to: ADMIN_EMAIL,
       subject: 'New Contact Form Submission',
       html: `
@@ -324,7 +326,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
 
     // Send confirmation to the user
     await resend.emails.send({
-      from: FROM_EMAIL,
+      from: FROM_EMAIL || FROM_EMAIL_DEFAULT,
       to: data.email,
       subject: 'Thank you for contacting Go Video Pro',
       html: `
