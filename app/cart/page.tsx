@@ -460,23 +460,6 @@ export default function CartPage() {
           </div>
         </nav>
 
-        <section className="flex justify-between mb-8" aria-label="Navigation controls">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={step === 1}
-            className="w-[120px]"
-          >
-            Previous
-          </Button>
-          <Button
-            onClick={nextStep}
-            className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
-          >
-            {step === 3 ? 'Checkout' : 'Next'}
-          </Button>
-        </section>
-
         {step === 1 && (
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Event details form">
             <div className="lg:col-span-6">
@@ -999,6 +982,66 @@ export default function CartPage() {
             </div>
           </section>
         )}
+
+        {/* Mobile navigation at bottom of content */}
+        <div className="lg:hidden mt-8">
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={step === 1}
+              className="w-[120px]"
+            >
+              Previous
+            </Button>
+            {step === 3 ? (
+              <Button
+                onClick={handleCheckout}
+                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Checkout"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNextStep}
+                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+              >
+                Next
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Desktop navigation */}
+        <div className="hidden lg:block">
+          <section className="flex justify-between mt-8" aria-label="Navigation controls">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={step === 1}
+              className="w-[120px]"
+            >
+              Previous
+            </Button>
+            {step === 3 ? (
+              <Button
+                onClick={handleCheckout}
+                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Checkout"}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleNextStep}
+                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+              >
+                Next
+              </Button>
+            )}
+          </section>
+        </div>
       </div>
     </main>
   )
