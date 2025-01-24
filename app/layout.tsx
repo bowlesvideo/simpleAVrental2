@@ -6,6 +6,7 @@ import { Footer } from '@/components/footer'
 import { Metadata } from 'next'
 import { SITE_NAME, getBaseUrl } from '@/lib/constants'
 
+// Force deployment to update environment variables
 const SITE_URL = getBaseUrl()
 
 export const metadata: Metadata = {
