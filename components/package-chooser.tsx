@@ -72,22 +72,22 @@ const PackageButtons = memo(({
   onPackageSelect: (pkg: Package) => void 
 }) => {
   return (
-    <div className="lg:col-span-3 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-3">
+    <div className="lg:col-span-3 grid grid-cols-2 lg:grid-cols-1 gap-1 lg:gap-1.5 h-fit">
       {packages.map((pkg) => (
         <button
           key={pkg.id}
           onClick={() => onPackageSelect(pkg)}
           className={cn(
-            "text-center lg:text-left px-3 py-2 lg:px-5 lg:py-4 rounded-lg transition-all duration-200",
+            "text-center lg:text-left px-3 py-5 lg:px-4 lg:py-5 rounded-lg transition-all duration-200 h-auto",
             selectedPackageId === pkg.id
               ? "bg-[#0095ff] text-white"
               : "bg-white/5 hover:bg-white/10"
           )}
         >
-          <h3 className="text-sm lg:text-lg font-semibold text-white">
+          <h3 className="text-sm lg:text-base font-semibold text-white">
             {pkg.name.replace(' Package', '')}
           </h3>
-          <p className="hidden lg:block text-sm text-white/70 mt-1">
+          <p className="hidden lg:block text-xs text-white/70 mt-0.5">
             Starting at {formatPrice(pkg.price)}
           </p>
         </button>
@@ -220,7 +220,7 @@ const PackageDetails = memo(({
       </div>
       <Button
         size="lg"
-        className="bg-[#0095ff] hover:bg-[#007acc] text-white w-full mt-5 py-6 text-base font-semibold"
+        className="bg-[#0095ff] hover:bg-[#007acc] text-white w-full mt-5 py-3 lg:py-6 text-base font-semibold"
         onClick={() => onChoosePackage(selectedPackage)}
       >
         Choose Package
