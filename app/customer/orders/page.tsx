@@ -11,9 +11,19 @@ interface EventDetails {
   eventLocation: string
   eventStartTime?: string
   eventEndTime?: string
+  customerName?: string
+  customerEmail?: string
   contactName?: string
   contactEmail?: string
   companyName?: string
+  billingAddress?: {
+    city: string
+    country: string
+    line1: string
+    line2?: string
+    postal_code: string
+    state: string
+  }
 }
 
 interface OrderWithDetails {
@@ -27,23 +37,36 @@ interface OrderWithDetails {
 }
 
 async function getCustomerOrders(email: string): Promise<OrderWithDetails[]> {
+  // Get all non-trashed orders
   const orders = await prisma.order.findMany({
     where: {
-      eventDetails: {
-        path: ['customerEmail'],
-        equals: email
+      NOT: {
+        status: 'trashed'
       }
     },
     orderBy: {
       orderDate: 'desc'
     }
-  })
+  });
   
-  return orders.map(order => ({
+  // Filter orders by email in eventDetails after parsing JSON
+  const filteredOrders = orders.filter(order => {
+    const details = typeof order.eventDetails === 'string' 
+      ? JSON.parse(order.eventDetails) 
+      : order.eventDetails;
+    
+    return details.customerEmail === email || details.contactEmail === email;
+  });
+  
+  return filteredOrders.map(order => ({
     ...order,
-    eventDetails: order.eventDetails as unknown as EventDetails,
-    items: order.items as any
-  }))
+    eventDetails: typeof order.eventDetails === 'string' 
+      ? JSON.parse(order.eventDetails) 
+      : order.eventDetails as unknown as EventDetails,
+    items: typeof order.items === 'string'
+      ? JSON.parse(order.items)
+      : order.items
+  }));
 }
 
 export default async function CustomerOrdersPage() {
@@ -66,11 +89,13 @@ export default async function CustomerOrdersPage() {
         <div className="grid gap-4">
           {orders.map((order) => {
             const eventDetails = order.eventDetails
+            const name = eventDetails.customerName || eventDetails.contactName
+            const email = eventDetails.customerEmail || eventDetails.contactEmail
             return (
               <Card key={order.id}>
                 <CardHeader>
                   <CardTitle>
-                    Order #{order.id.slice(-6)}
+                    Order #{order.id}
                     <span className="ml-2 text-sm font-normal text-gray-500">
                       {format(new Date(order.orderDate), 'MMM d, yyyy')}
                     </span>
@@ -85,6 +110,10 @@ export default async function CustomerOrdersPage() {
                     <div>
                       <span className="font-medium">Location:</span>{' '}
                       {eventDetails.eventLocation}
+                    </div>
+                    <div>
+                      <span className="font-medium">Contact:</span>{' '}
+                      {name} ({email})
                     </div>
                     <div>
                       <span className="font-medium">Status:</span>{' '}
