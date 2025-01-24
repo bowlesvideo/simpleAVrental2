@@ -8,6 +8,7 @@ import { SITE_NAME, getBaseUrl } from '@/lib/constants'
 import Script from 'next/script'
 
 // Force deployment to update environment variables
+// Trigger deploy for GA setup - 2024-01-24
 const SITE_URL = getBaseUrl()
 
 export const metadata: Metadata = {
