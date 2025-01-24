@@ -29,3 +29,23 @@ model RentalConfig {
 
   @@map("rental_config")
 }
+
+model Contact {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  company   String?
+  message   String
+  status    ContactStatus @default(new)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([createdAt(sort: Desc)])
+  @@index([status])
+}
+
+enum ContactStatus {
+  new
+  replied
+  archived
+}
