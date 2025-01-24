@@ -137,7 +137,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart()
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-  const [eventDate, setEventDate] = useState(getTenBusinessDaysAhead())
+  const [eventDate, setEventDate] = useState<Date | null>(null)
   const [eventStartTime, setEventStartTime] = useState('09:00')
   const [eventEndTime, setEventEndTime] = useState('11:00')
   const [eventLocation, setEventLocation] = useState('')
@@ -151,6 +151,11 @@ export default function CartPage() {
   const [contactEmail, setContactEmail] = useState('')
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [showErrors, setShowErrors] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<{
+    eventDate?: boolean;
+    eventStartTime?: boolean;
+    eventEndTime?: boolean;
+  }>({})
 
   // Load event details from localStorage on mount
   useEffect(() => {
@@ -159,9 +164,11 @@ export default function CartPage() {
       try {
         const details = JSON.parse(savedDetails)
         // Make sure we parse the date correctly
-        const parsedDate = new Date(details.eventDate)
-        if (!isNaN(parsedDate.getTime())) {
-          setEventDate(parsedDate)
+        if (details.eventDate) {
+          const parsedDate = new Date(details.eventDate)
+          if (!isNaN(parsedDate.getTime())) {
+            setEventDate(parsedDate)
+          }
         }
         
         // Set all other fields if they exist
@@ -198,7 +205,7 @@ export default function CartPage() {
   useEffect(() => {
     try {
       const details = {
-        eventDate: eventDate.toISOString(),
+        eventDate: eventDate?.toISOString(),
         eventStartTime,
         eventEndTime,
         eventLocation,
@@ -377,8 +384,32 @@ export default function CartPage() {
     }
   }
 
+  // Add validation function for step 1
+  const validateStep1 = () => {
+    const errors: typeof validationErrors = {}
+    
+    if (!eventDate || isNaN(eventDate.getTime())) {
+      errors.eventDate = true
+    }
+    if (!eventStartTime) {
+      errors.eventStartTime = true
+    }
+    if (!eventEndTime) {
+      errors.eventEndTime = true
+    }
+    
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleNextStep = () => {
-    if (step === 2 && !isContactDetailsValid) {
+    if (step === 1) {
+      const isValid = validateStep1()
+      if (!isValid) {
+        setShowErrors(true)
+        return
+      }
+    } else if (step === 2 && !isContactDetailsValid) {
       setShowErrors(true)
       return
     }
@@ -406,7 +437,7 @@ export default function CartPage() {
           type: item.type,
           keyFeatures: item.keyFeatures
         })),
-        eventDate: eventDate.toISOString(),
+        eventDate: eventDate?.toISOString(),
         eventStartTime,
         eventEndTime,
         eventLocation,
@@ -530,65 +561,104 @@ export default function CartPage() {
         {step === 1 && (
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Event details form">
             <div className="lg:col-span-6">
-              <Card>
+              <Card className={cn(
+                showErrors && validationErrors.eventDate && "ring-2 ring-red-500"
+              )}>
                 <CardHeader className="pb-3">
                   <CardTitle>Event Details</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col lg:flex-row gap-6">
                     <div className="w-full lg:flex-1">
-                      <Label className="text-sm font-medium mb-2 block">Event Date</Label>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.eventDate && "text-red-500"
+                      )}>
+                        Event Date {showErrors && validationErrors.eventDate && "- Required"}
+                      </Label>
                       <Calendar
                         mode="single"
                         selected={eventDate}
-                        onSelect={(date: Date | undefined) => date && setEventDate(date)}
-                        className="rounded-md border w-full"
-                        disabled={{ before: new Date() }}
-                        classNames={{
-                          root: "w-full",
-                          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                          month: "space-y-4 w-full",
-                          caption: "flex justify-center pt-1 relative items-center",
-                          caption_label: "text-sm font-medium",
-                          nav: "space-x-1 flex items-center",
-                          nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-                          nav_button_previous: "absolute left-1",
-                          nav_button_next: "absolute right-1",
-                          table: "w-full border-collapse space-y-1",
-                          head_row: "flex justify-between",
-                          head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-                          row: "flex w-full mt-2 justify-between",
-                          cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full hover:bg-[#0095ff]/10 hover:text-[#0095ff] focus:bg-[#0095ff]/10 focus:text-[#0095ff] disabled:opacity-50 disabled:pointer-events-none",
-                          day_range_end: "day-range-end",
-                          day_selected: "!bg-[#0095ff] !text-white hover:!bg-[#0095ff] hover:!text-white focus:!bg-[#0095ff] focus:!text-white disabled:!opacity-50 disabled:!pointer-events-none",
-                          day_today: "bg-[#0095ff]/10 text-[#0095ff] rounded-full",
-                          day_outside: "text-muted-foreground opacity-50",
-                          day_disabled: "text-muted-foreground opacity-50",
-                          day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-                          day_hidden: "invisible"
+                        onSelect={(date: Date | undefined) => {
+                          setEventDate(date || null)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, eventDate: !date}))
+                          }
                         }}
+                        className={cn(
+                          "rounded-md border w-full",
+                          showErrors && validationErrors.eventDate && "border-red-500"
+                        )}
+                        disabled={{ before: new Date() }}
                       />
                     </div>
-                    <div className="grid grid-cols-2 lg:w-[180px] gap-4">
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Start Time</Label>
-                        <Input
-                          type="time"
-                          value={eventStartTime}
-                          onChange={(e) => setEventStartTime(e.target.value)}
-                          className="h-9 text-base px-2"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">End Time</Label>
-                        <Input
-                          type="time"
-                          value={eventEndTime}
-                          onChange={(e) => setEventEndTime(e.target.value)}
-                          className="h-9 text-base px-2"
-                        />
-                      </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.eventStartTime && "text-red-500"
+                      )}>
+                        Start Time {showErrors && validationErrors.eventStartTime && "- Required"}
+                      </Label>
+                      <Select 
+                        value={eventStartTime} 
+                        onValueChange={(value) => {
+                          setEventStartTime(value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, eventStartTime: !value}))
+                          }
+                        }}
+                      >
+                        <SelectTrigger className={cn(
+                          showErrors && validationErrors.eventStartTime && "border-red-500"
+                        )}>
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 24 }, (_, i) => {
+                            const hour = i.toString().padStart(2, '0')
+                            return (
+                              <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
+                                {`${hour}:00`}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.eventEndTime && "text-red-500"
+                      )}>
+                        End Time {showErrors && validationErrors.eventEndTime && "- Required"}
+                      </Label>
+                      <Select 
+                        value={eventEndTime} 
+                        onValueChange={(value) => {
+                          setEventEndTime(value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, eventEndTime: !value}))
+                          }
+                        }}
+                      >
+                        <SelectTrigger className={cn(
+                          showErrors && validationErrors.eventEndTime && "border-red-500"
+                        )}>
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 24 }, (_, i) => {
+                            const hour = i.toString().padStart(2, '0')
+                            return (
+                              <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
+                                {`${hour}:00`}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </CardContent>
@@ -865,7 +935,7 @@ export default function CartPage() {
                   <div>
                     <h3 className="font-semibold mb-2">Event Details</h3>
                     <div className="space-y-1 text-sm">
-                      <p>Date: {format(eventDate, 'MMMM d, yyyy')}</p>
+                      <p>Date: {eventDate ? format(eventDate, 'MMMM d, yyyy') : 'Not selected'}</p>
                       <p>Time: {eventStartTime} - {eventEndTime}</p>
                       <p>Location: {eventLocation}</p>
                       <p>Address: {street}</p>
