@@ -149,7 +149,7 @@ export default function CartPage() {
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [contactEmail, setContactEmail] = useState('')
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [showErrors, setShowErrors] = useState(false)
 
   // Load event details from localStorage on mount
@@ -228,7 +228,7 @@ export default function CartPage() {
 
   const nextStep = () => {
     const currentStep = step
-    const newStep = Math.min(currentStep + 1, 3)
+    const newStep = Math.min(currentStep + 1, 3) as 1 | 2 | 3
     setStep(newStep)
     
     // Send GA event for checkout steps
@@ -262,7 +262,7 @@ export default function CartPage() {
     }
   }
 
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1) as 1 | 2 | 3)
   
   const isContactDetailsValid = companyName && contactName && contactEmail
 
@@ -388,7 +388,7 @@ export default function CartPage() {
   const handleStepClick = (targetStep: number) => {
     // Only allow going to steps that have been completed or are next
     if (targetStep <= Math.max(step, 2)) {
-      setStep(targetStep)
+      setStep(targetStep as 1 | 2 | 3)
     }
   }
 
@@ -692,17 +692,6 @@ export default function CartPage() {
                           <span>${Math.round(total * 0.5).toLocaleString()}</span>
                         </div>
                       </div>
-                      {step === 3 && (
-                        <div className="mt-6">
-                          <Button 
-                            onClick={handleCheckout}
-                            className="w-full bg-[#0095ff] text-white hover:bg-[#007acc]"
-                            disabled={isLoading}
-                          >
-                            {isLoading ? "Processing..." : "Proceed to Checkout"}
-                          </Button>
-                        </div>
-                      )}
                     </section>
                   </div>
                 </CardContent>
@@ -818,35 +807,11 @@ export default function CartPage() {
                       <section aria-label="Selected packages" className="space-y-2">
                         <h3 className="font-medium text-sm text-gray-500">Packages</h3>
                         {packages.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center group">
+                          <div key={item.id} className="flex justify-between items-center">
                             <span>{item.name}</span>
                             <div className="flex items-center gap-2">
-                              <div className="flex items-center border rounded-md">
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  className="px-2 py-1 hover:bg-gray-100 border-r"
-                                  aria-label="Decrease quantity"
-                                >
-                                  -
-                                </button>
-                                <span className="px-3 py-1">{item.quantity}x</span>
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="px-2 py-1 hover:bg-gray-100 border-l"
-                                  aria-label="Increase quantity"
-                                >
-                                  +
-                                </button>
-                              </div>
+                              <span className="px-3 py-1">{item.quantity}x</span>
                               <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
-                              <button
-                                onClick={() => removeItem(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                              </button>
                             </div>
                           </div>
                         ))}
@@ -856,35 +821,11 @@ export default function CartPage() {
                       <section aria-label="Selected add-ons" className="space-y-2">
                         <h3 className="font-medium text-sm text-gray-500">Add-ons</h3>
                         {addons.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center group">
+                          <div key={item.id} className="flex justify-between items-center">
                             <span>{item.name}</span>
                             <div className="flex items-center gap-2">
-                              <div className="flex items-center border rounded-md">
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  className="px-2 py-1 hover:bg-gray-100 border-r"
-                                  aria-label="Decrease quantity"
-                                >
-                                  -
-                                </button>
-                                <span className="px-3 py-1">{item.quantity}x</span>
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="px-2 py-1 hover:bg-gray-100 border-l"
-                                  aria-label="Increase quantity"
-                                >
-                                  +
-                                </button>
-                              </div>
+                              <span className="px-3 py-1">{item.quantity}x</span>
                               <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
-                              <button
-                                onClick={() => removeItem(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                </svg>
-                              </button>
                             </div>
                           </div>
                         ))}
@@ -1021,7 +962,7 @@ export default function CartPage() {
             >
               Previous
             </Button>
-            {step < 3 && (
+            {step !== 3 && (
               <Button
                 onClick={handleNextStep}
                 className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
@@ -1043,7 +984,7 @@ export default function CartPage() {
             >
               Previous
             </Button>
-            {step < 3 && (
+            {step !== 3 && (
               <Button
                 onClick={handleNextStep}
                 className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
