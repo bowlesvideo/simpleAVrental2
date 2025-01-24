@@ -6,8 +6,8 @@ if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set')
 }
 
-if (!process.env.NEXT_PUBLIC_BASE_URL) {
-  throw new Error('NEXT_PUBLIC_BASE_URL is not set')
+if (!process.env.NEXT_PUBLIC_SITE_URL) {
+  throw new Error('NEXT_PUBLIC_SITE_URL is not set')
 }
 
 // Initialize Stripe with live mode configuration
