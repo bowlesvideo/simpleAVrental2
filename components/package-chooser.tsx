@@ -170,6 +170,7 @@ const PackageDetails = memo(({
   selectedAddOnIds: string[],
   addOns: AddOn[]
 }) => {
+  const [focusedImage, setFocusedImage] = useState<string | null>(null);
   const icons: { [key: string]: LucideIcon } = {
     Video,
     Mic,
@@ -180,6 +181,13 @@ const PackageDetails = memo(({
     Sun,
     Users
   };
+
+  useEffect(() => {
+    // Reset focused image when package changes
+    if (selectedPackage?.image) {
+      setFocusedImage(selectedPackage.image);
+    }
+  }, [selectedPackage]);
 
   if (!selectedPackage) {
     return (
@@ -208,7 +216,7 @@ const PackageDetails = memo(({
               <>
                 <div className="relative aspect-[16/9] rounded-lg overflow-hidden mb-3">
                   <Image
-                    src={selectedPackage.image}
+                    src={focusedImage || selectedPackage.image}
                     alt={selectedPackage.name}
                     fill
                     className="object-cover"
@@ -216,10 +224,32 @@ const PackageDetails = memo(({
                   />
                 </div>
                 <div className="grid grid-cols-4 gap-2">
-                  {(selectedPackage.additionalImages || []).slice(0, 4).map((img, idx) => (
+                  <div 
+                    className={cn(
+                      "relative aspect-[4/3] rounded-md overflow-hidden border transition-all cursor-pointer",
+                      focusedImage === selectedPackage.image 
+                        ? "border-[#0095ff] opacity-100 shadow-md" 
+                        : "border-gray-100 opacity-80 hover:opacity-100"
+                    )}
+                    onClick={() => setFocusedImage(selectedPackage.image)}
+                  >
+                    <Image
+                      src={selectedPackage.image}
+                      alt={`${selectedPackage.name} main preview`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  {(selectedPackage.additionalImages || []).slice(0, 3).map((img, idx) => (
                     <div 
                       key={idx} 
-                      className="relative aspect-[4/3] rounded-md overflow-hidden border border-gray-100 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                      className={cn(
+                        "relative aspect-[4/3] rounded-md overflow-hidden border transition-all cursor-pointer",
+                        focusedImage === img 
+                          ? "border-[#0095ff] opacity-100 shadow-md" 
+                          : "border-gray-100 opacity-80 hover:opacity-100"
+                      )}
+                      onClick={() => setFocusedImage(img)}
                     >
                       <Image
                         src={img}
