@@ -72,22 +72,22 @@ const PackageButtons = memo(({
   onPackageSelect: (pkg: Package) => void 
 }) => {
   return (
-    <div className="lg:col-span-3 space-y-3">
+    <div className="lg:col-span-3 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:gap-3">
       {packages.map((pkg) => (
         <button
           key={pkg.id}
           onClick={() => onPackageSelect(pkg)}
           className={cn(
-            "w-full text-left px-5 py-4 rounded-lg transition-all duration-200",
+            "text-center lg:text-left px-3 py-2 lg:px-5 lg:py-4 rounded-lg transition-all duration-200",
             selectedPackageId === pkg.id
               ? "bg-[#0095ff] text-white"
               : "bg-white/5 hover:bg-white/10"
           )}
         >
-          <h3 className="text-lg font-semibold text-white mb-1">
-            {pkg.name}
+          <h3 className="text-sm lg:text-lg font-semibold text-white">
+            {pkg.name.replace(' Package', '')}
           </h3>
-          <p className="text-sm text-white/70">
+          <p className="hidden lg:block text-sm text-white/70 mt-1">
             Starting at {formatPrice(pkg.price)}
           </p>
         </button>
