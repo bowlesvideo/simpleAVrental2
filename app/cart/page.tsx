@@ -143,7 +143,7 @@ export default function CartPage() {
   const [eventLocation, setEventLocation] = useState('')
   const [street, setStreet] = useState('')
   const [city, setCity] = useState('')
-  const [state, setState] = useState('')
+  const [state, setState] = useState('FL')
   const [zip, setZip] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [contactName, setContactName] = useState('')
@@ -155,6 +155,13 @@ export default function CartPage() {
     eventDate?: boolean;
     eventStartTime?: boolean;
     eventEndTime?: boolean;
+    companyName?: boolean;
+    contactName?: boolean;
+    contactEmail?: boolean;
+    eventLocation?: boolean;
+    city?: boolean;
+    state?: boolean;
+    zip?: boolean;
   }>({})
 
   // Load event details from localStorage on mount
@@ -185,7 +192,7 @@ export default function CartPage() {
         if (details.contactEmail) setContactEmail(details.contactEmail)
 
         // Determine which step to show based on completed data
-        if (parsedDate && details.eventStartTime && details.eventEndTime) {
+        if (details.eventDate && details.eventStartTime && details.eventEndTime) {
           if (details.companyName && details.contactName && details.contactEmail) {
             setStep(3)
           } else {
@@ -402,6 +409,36 @@ export default function CartPage() {
     return Object.keys(errors).length === 0
   }
 
+  // Update validation function for step 2
+  const validateStep2 = () => {
+    const errors: typeof validationErrors = {}
+    
+    if (!companyName) {
+      errors.companyName = true
+    }
+    if (!eventLocation) {
+      errors.eventLocation = true
+    }
+    if (!city) {
+      errors.city = true
+    }
+    if (!state) {
+      errors.state = true
+    }
+    if (!zip) {
+      errors.zip = true
+    }
+    if (!contactName) {
+      errors.contactName = true
+    }
+    if (!contactEmail) {
+      errors.contactEmail = true
+    }
+    
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleNextStep = () => {
     if (step === 1) {
       const isValid = validateStep1()
@@ -409,17 +446,43 @@ export default function CartPage() {
         setShowErrors(true)
         return
       }
-    } else if (step === 2 && !isContactDetailsValid) {
-      setShowErrors(true)
-      return
+    } else if (step === 2) {
+      const isValid = validateStep2()
+      if (!isValid) {
+        setShowErrors(true)
+        return
+      }
     }
     nextStep()
   }
 
   const handleStepClick = (targetStep: number) => {
-    // Only allow going to steps that have been completed or are next
-    if (targetStep <= Math.max(step, 2)) {
+    // If going backwards, always allow
+    if (targetStep < step) {
       setStep(targetStep as 1 | 2 | 3)
+      return
+    }
+
+    // If trying to go to step 3, validate step 2 first
+    if (targetStep === 3 && step === 2) {
+      const isValid = validateStep2()
+      if (!isValid) {
+        setShowErrors(true)
+        return
+      }
+      setStep(3)
+      return
+    }
+
+    // If trying to go to step 2, validate step 1 first
+    if (targetStep === 2 && step === 1) {
+      const isValid = validateStep1()
+      if (!isValid) {
+        setShowErrors(true)
+        return
+      }
+      setStep(2)
+      return
     }
   }
 
@@ -578,8 +641,8 @@ export default function CartPage() {
                       </Label>
                       <Calendar
                         mode="single"
-                        selected={eventDate}
-                        onSelect={(date: Date | undefined) => {
+                        selected={eventDate || undefined}
+                        onSelect={(date) => {
                           setEventDate(date || null)
                           if (showErrors) {
                             setValidationErrors(prev => ({...prev, eventDate: !date}))
@@ -773,95 +836,194 @@ export default function CartPage() {
         {step === 2 && (
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Contact information form">
             <div className="lg:col-span-6">
-              <Card>
-                <CardHeader>
+              <Card className={cn(
+                showErrors && (validationErrors.companyName || validationErrors.contactName || validationErrors.contactEmail) && "ring-2 ring-red-500"
+              )}>
+                <CardHeader className="pb-3">
                   <CardTitle>Contact Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Company</Label>
-                    <Input
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      placeholder="Enter company name"
-                      autoComplete="organization"
-                    />
-                  </div>
-                  <div>
-                    <Label>Event Location</Label>
-                    <Input
-                      value={eventLocation}
-                      onChange={(e) => setEventLocation(e.target.value)}
-                      placeholder="Enter event location"
-                      autoComplete="street-address"
-                    />
-                  </div>
-                  <div className="grid grid-cols-6 gap-4">
-                    <div className="col-span-2">
-                      <Label>City</Label>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.companyName && "text-red-500"
+                      )}>
+                        Company Name {showErrors && validationErrors.companyName && "- Required"}
+                      </Label>
                       <Input
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder="Enter city"
+                        type="text"
+                        value={companyName}
+                        onChange={(e) => {
+                          setCompanyName(e.target.value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, companyName: !e.target.value}))
+                          }
+                        }}
+                        className={cn(
+                          showErrors && validationErrors.companyName && "border-red-500"
+                        )}
+                        placeholder="Enter company name"
+                        autoComplete="organization"
                       />
                     </div>
-                    <div className="col-span-2">
-                      <Label>State</Label>
-                      <Select value={state} onValueChange={setState}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {US_STATES.map((s) => (
-                            <SelectItem key={s.value} value={s.value}>
-                              {s.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {state && state !== 'FL' && (
-                        <p className="text-red-500 text-sm mt-2">
-                          We only support events in Florida at this time. Please contact us for questions
-                        </p>
-                      )}
-                    </div>
-                    <div className="col-span-2">
-                      <Label>ZIP Code</Label>
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.eventLocation && "text-red-500"
+                      )}>
+                        Event Location {showErrors && validationErrors.eventLocation && "- Required"}
+                      </Label>
                       <Input
-                        value={zip}
-                        onChange={(e) => setZip(e.target.value)}
-                        placeholder="ZIP"
+                        value={eventLocation}
+                        onChange={(e) => {
+                          setEventLocation(e.target.value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, eventLocation: !e.target.value}))
+                          }
+                        }}
+                        className={cn(
+                          showErrors && validationErrors.eventLocation && "border-red-500"
+                        )}
+                        placeholder="Enter event location"
+                        autoComplete="street-address"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label>Contact Name</Label>
-                    <Input
-                      value={contactName}
-                      onChange={(e) => setContactName(e.target.value)}
-                      placeholder="Enter full name"
-                      autoComplete="name"
-                    />
-                  </div>
-                  <div>
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
-                      placeholder="Enter email address"
-                      autoComplete="email"
-                    />
-                  </div>
-                  <div>
-                    <Label>Phone</Label>
-                    <Input
-                      type="tel"
-                      value={contactPhone}
-                      onChange={(e) => setContactPhone(formatPhone(e.target.value))}
-                      placeholder="Enter phone number"
-                      autoComplete="tel"
-                    />
+                    <div className="grid grid-cols-6 gap-4">
+                      <div className="col-span-2">
+                        <Label className={cn(
+                          "text-sm font-medium mb-2 block",
+                          showErrors && validationErrors.city && "text-red-500"
+                        )}>
+                          City {showErrors && validationErrors.city && "- Required"}
+                        </Label>
+                        <Input
+                          value={city}
+                          onChange={(e) => {
+                            setCity(e.target.value)
+                            if (showErrors) {
+                              setValidationErrors(prev => ({...prev, city: !e.target.value}))
+                            }
+                          }}
+                          className={cn(
+                            showErrors && validationErrors.city && "border-red-500"
+                          )}
+                          placeholder="Enter city"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label className={cn(
+                          "text-sm font-medium mb-2 block",
+                          showErrors && validationErrors.state && "text-red-500"
+                        )}>
+                          State {showErrors && validationErrors.state && "- Required"}
+                        </Label>
+                        <Select 
+                          value={state} 
+                          onValueChange={(value) => {
+                            setState(value)
+                            if (showErrors) {
+                              setValidationErrors(prev => ({...prev, state: !value}))
+                            }
+                          }}
+                        >
+                          <SelectTrigger className={cn(
+                            showErrors && validationErrors.state && "border-red-500"
+                          )}>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {US_STATES.map((s) => (
+                              <SelectItem key={s.value} value={s.value}>
+                                {s.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {state && state !== 'FL' && (
+                          <p className="text-red-500 text-sm mt-2">
+                            We only support events in Florida at this time. Please contact us for questions
+                          </p>
+                        )}
+                      </div>
+                      <div className="col-span-2">
+                        <Label className={cn(
+                          "text-sm font-medium mb-2 block",
+                          showErrors && validationErrors.zip && "text-red-500"
+                        )}>
+                          ZIP Code {showErrors && validationErrors.zip && "- Required"}
+                        </Label>
+                        <Input
+                          value={zip}
+                          onChange={(e) => {
+                            setZip(e.target.value)
+                            if (showErrors) {
+                              setValidationErrors(prev => ({...prev, zip: !e.target.value}))
+                            }
+                          }}
+                          className={cn(
+                            showErrors && validationErrors.zip && "border-red-500"
+                          )}
+                          placeholder="ZIP"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.contactName && "text-red-500"
+                      )}>
+                        Contact Name {showErrors && validationErrors.contactName && "- Required"}
+                      </Label>
+                      <Input
+                        type="text"
+                        value={contactName}
+                        onChange={(e) => {
+                          setContactName(e.target.value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, contactName: !e.target.value}))
+                          }
+                        }}
+                        className={cn(
+                          showErrors && validationErrors.contactName && "border-red-500"
+                        )}
+                        placeholder="Enter full name"
+                        autoComplete="name"
+                      />
+                    </div>
+                    <div>
+                      <Label className={cn(
+                        "text-sm font-medium mb-2 block",
+                        showErrors && validationErrors.contactEmail && "text-red-500"
+                      )}>
+                        Contact Email {showErrors && validationErrors.contactEmail && "- Required"}
+                      </Label>
+                      <Input
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => {
+                          setContactEmail(e.target.value)
+                          if (showErrors) {
+                            setValidationErrors(prev => ({...prev, contactEmail: !e.target.value}))
+                          }
+                        }}
+                        className={cn(
+                          showErrors && validationErrors.contactEmail && "border-red-500"
+                        )}
+                        placeholder="Enter email address"
+                        autoComplete="email"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Contact Phone (Optional)</Label>
+                      <Input
+                        type="tel"
+                        value={contactPhone}
+                        onChange={(e) => setContactPhone(formatPhone(e.target.value))}
+                        placeholder="Enter phone number"
+                        autoComplete="tel"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
