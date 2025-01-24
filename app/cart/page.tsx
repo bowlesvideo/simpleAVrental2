@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils"
 
 interface CartItem {
   id: string
@@ -429,34 +430,31 @@ export default function CartPage() {
     <main className="min-h-screen bg-white py-8" role="main">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav className="mb-8" aria-label="Checkout progress">
-          <div className="flex justify-between items-center">
-            <button
-              onClick={() => handleStepClick(1)}
-              className={`flex-1 text-center py-2 border-b-2 ${
-                step >= 1 ? 'border-blue-500 text-blue-500' : 'border-gray-200 text-gray-400'
-              }`}
-              aria-current={step === 1 ? 'step' : undefined}
-            >
-              1. Event Details
-            </button>
-            <button
-              onClick={() => handleStepClick(2)}
-              className={`flex-1 text-center py-2 border-b-2 ${
-                step >= 2 ? 'border-blue-500 text-blue-500' : 'border-gray-200 text-gray-400'
-              }`}
-              aria-current={step === 2 ? 'step' : undefined}
-            >
-              2. Contact Information
-            </button>
-            <button
-              onClick={() => handleStepClick(3)}
-              className={`flex-1 text-center py-2 border-b-2 ${
-                step === 3 ? 'border-blue-500 text-blue-500' : 'border-gray-200 text-gray-400'
-              }`}
-              aria-current={step === 3 ? 'step' : undefined}
-            >
-              3. Review & Checkout
-            </button>
+          <div className="flex justify-between items-center relative">
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200"></div>
+            {[
+              { step: 1, label: "Event", fullLabel: "Event Details" },
+              { step: 2, label: "Contact", fullLabel: "Contact Information" },
+              { step: 3, label: "Review", fullLabel: "Review & Checkout" }
+            ].map(({ step: stepNum, label, fullLabel }) => (
+              <button
+                key={stepNum}
+                onClick={() => handleStepClick(stepNum)}
+                className={cn(
+                  "flex-1 relative text-center py-2",
+                  "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5",
+                  step >= stepNum 
+                    ? "text-[#0095ff] after:bg-[#0095ff]" 
+                    : "text-gray-400 after:bg-transparent",
+                )}
+                aria-current={step === stepNum ? 'step' : undefined}
+                aria-label={fullLabel}
+              >
+                <span className="text-sm sm:text-base">
+                  {stepNum}. {label}
+                </span>
+              </button>
+            ))}
           </div>
         </nav>
 
@@ -672,7 +670,7 @@ export default function CartPage() {
                       <Label>State</Label>
                       <Select value={state} onValueChange={setState}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select state" />
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                           {US_STATES.map((s) => (
@@ -682,6 +680,11 @@ export default function CartPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {state && state !== 'FL' && (
+                        <p className="text-red-500 text-sm mt-2">
+                          We only support events in Florida at this time. Please contact us for questions
+                        </p>
+                      )}
                     </div>
                     <div className="col-span-2">
                       <Label>ZIP Code</Label>
