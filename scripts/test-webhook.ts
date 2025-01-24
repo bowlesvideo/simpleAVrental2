@@ -20,6 +20,7 @@ async function testWebhook() {
         eventDate: new Date(),
         total: 100,
         status: 'pending',
+        updatedAt: new Date(),
         items: [],
         eventDetails: {}
       }

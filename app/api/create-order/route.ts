@@ -99,7 +99,8 @@ export async function POST(request: Request) {
           eventEndTime,
           eventLocation,
           ...contactDetails
-        })
+        }),
+        updatedAt: new Date()
       }
       console.log('Attempting to create order with data:', JSON.stringify(orderData, null, 2))
 

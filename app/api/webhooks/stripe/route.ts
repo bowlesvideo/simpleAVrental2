@@ -58,7 +58,8 @@ export async function POST(request: Request) {
               paymentIntent: session.payment_intent,
               customerEmail: session.customer_details?.email,
               customerName: session.customer_details?.name,
-            })
+            }),
+            updatedAt: new Date()
           }
         });
 

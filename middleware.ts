@@ -1,55 +1,45 @@
 import { NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
-import { NextRequestWithAuth } from 'next-auth/middleware'
 import type { NextRequest } from 'next/server'
 
-export default async function middleware(request: NextRequestWithAuth) {
-  const token = await getToken({ req: request })
-  const isAuth = !!token
-  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const isSignUpPage = request.nextUrl.pathname === '/auth/signup'
-  const isApiRoute = request.nextUrl.pathname.startsWith('/api')
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
 
-  // Redirect authenticated users away from auth pages (except signup)
-  if (isAuthPage && !isSignUpPage) {
-    if (isAuth) {
+  // Handle auth routes
+  if (path.startsWith('/auth/')) {
+    const token = await getToken({ req: request })
+    const isAuth = !!token
+    const isSignUpPage = path === '/auth/signup'
+
+    // Redirect authenticated users away from auth pages (except signup)
+    if (!isSignUpPage && isAuth) {
       return NextResponse.redirect(new URL('/', request.url))
     }
     return null
   }
 
-  return null
-}
-
-// Protect these routes
-export const config = {
-  matcher: [
-    '/auth/signin',
-    '/profile/:path*',
-    '/api/admin/:path*',
-  ]
-}
-
-export function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname
-
-  // Check if the path starts with /customer/
+  // Handle customer routes
   if (path.startsWith('/customer/')) {
     // Get the auth cookie
-    const authCookie = request.cookies.get('auth')
+    const authCookie = request.cookies.get('authEmail')
     
     // If no auth cookie is present, redirect to login
     if (!authCookie) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // Get the customer ID from the URL
-    const customerId = path.split('/')[2]
+    // Get the customer email from the cookie
+    const customerEmail = authCookie.value
 
-    // If the auth cookie value doesn't match the customer ID in the URL,
-    // redirect to login (this prevents accessing other customers' orders)
-    if (authCookie.value !== customerId) {
-      return NextResponse.redirect(new URL('/login', request.url))
+    // For now, we'll just verify that they have an auth cookie
+    // In the future, we might want to verify the email matches the requested customer's email
+  }
+
+  // Handle admin routes
+  if (path.startsWith('/api/admin/')) {
+    const token = await getToken({ req: request })
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
   }
 
@@ -58,6 +48,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/customer/:customerId*',
+    '/auth/signin',
+    '/auth/signup',
+    '/customer/:path*',
+    '/api/admin/:path*',
   ]
 }

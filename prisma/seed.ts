@@ -115,70 +115,79 @@ async function main() {
   })
 
   // Create a customer
-  const customer = await prisma.customer.upsert({
-    where: { email: 'stephen@bowlescreative.com' },
-    update: {},
-    create: {
-      email: 'stephen@bowlescreative.com',
+  await prisma.customer.create({
+    data: {
+      id: 'cust001',
+      email: 'demo@example.com',
+      updatedAt: new Date(),
       orders: {
         create: [
           {
+            id: 'ORD240110-001',
             orderDate: new Date('2024-01-10'),
             eventDate: new Date('2024-02-10'),
             total: 3500,
-            status: 'completed',
-            updatedAt: new Date(),
-            items: [
-              {
-                id: 'training-package',
-                name: 'Training Package',
-                price: 3500,
-                quantity: 1,
-                type: 'package'
-              }
-            ],
-            eventDetails: {
-              eventStartTime: '9:00 AM',
-              eventEndTime: '5:00 PM',
-              eventLocation: '123 Business Center',
-              city: 'Orlando',
-              state: 'FL',
-              zip: '32801',
-              companyName: 'Tech Training Co',
-              contactName: 'Stephen Bowles',
-              contactEmail: 'stephen@bowlescreative.com',
-              contactPhone: '555-0123'
-            }
-          },
-          {
-            orderDate: new Date('2024-01-15'),
-            eventDate: new Date('2024-02-15'),
-            total: 2500,
             status: 'confirmed',
             updatedAt: new Date(),
             items: [
               {
-                id: 'meeting-package',
-                name: 'Meeting Package',
-                price: 2500,
+                id: 'PKG001',
+                name: 'Premium Wedding Package',
+                price: 3000,
                 quantity: 1,
                 type: 'package'
+              },
+              {
+                id: 'ADD001',
+                name: 'Extra Microphone',
+                price: 500,
+                quantity: 1,
+                type: 'addon'
               }
             ],
             eventDetails: {
-              eventStartTime: '10:00 AM',
-              eventEndTime: '2:00 PM',
-              eventLocation: '456 Conference Center',
-              city: 'Orlando',
-              state: 'FL',
-              zip: '32803',
-              companyName: 'Business Solutions Inc',
-              contactName: 'Stephen Bowles',
-              contactEmail: 'stephen@bowlescreative.com',
-              contactPhone: '555-0123'
+              eventStartTime: '14:00',
+              eventEndTime: '22:00',
+              eventLocation: '123 Wedding Venue Way, San Francisco, CA 94105',
+              companyName: 'Dream Weddings Inc',
+              contactName: 'Sarah Johnson',
+              contactEmail: 'sarah@dreamweddings.com'
             }
           },
           {
+            id: 'ORD240115-001',
+            orderDate: new Date('2024-01-15'),
+            eventDate: new Date('2024-02-15'),
+            total: 2500,
+            status: 'pending',
+            updatedAt: new Date(),
+            items: [
+              {
+                id: 'PKG002',
+                name: 'Corporate Event Package',
+                price: 2000,
+                quantity: 1,
+                type: 'package'
+              },
+              {
+                id: 'ADD002',
+                name: 'Projector Screen',
+                price: 500,
+                quantity: 1,
+                type: 'addon'
+              }
+            ],
+            eventDetails: {
+              eventStartTime: '09:00',
+              eventEndTime: '17:00',
+              eventLocation: '456 Conference Center Dr, San Francisco, CA 94105',
+              companyName: 'Tech Innovations LLC',
+              contactName: 'Michael Chen',
+              contactEmail: 'michael@techinnovations.com'
+            }
+          },
+          {
+            id: 'ORD240120-001',
             orderDate: new Date('2024-01-20'),
             eventDate: new Date('2024-04-10'),
             total: 3000,
@@ -186,24 +195,27 @@ async function main() {
             updatedAt: new Date(),
             items: [
               {
-                id: 'webinar-package',
-                name: 'Webinar Package',
-                price: 3000,
+                id: 'PKG003',
+                name: 'Birthday Party Package',
+                price: 2500,
                 quantity: 1,
                 type: 'package'
+              },
+              {
+                id: 'ADD003',
+                name: 'LED Dance Floor Lights',
+                price: 500,
+                quantity: 1,
+                type: 'addon'
               }
             ],
             eventDetails: {
-              eventStartTime: '1:00 PM',
-              eventEndTime: '4:00 PM',
-              eventLocation: '789 Innovation Hub',
-              city: 'Orlando',
-              state: 'FL',
-              zip: '32806',
-              companyName: 'Digital Events LLC',
-              contactName: 'Stephen Bowles',
-              contactEmail: 'stephen@bowlescreative.com',
-              contactPhone: '555-0123'
+              eventStartTime: '18:00',
+              eventEndTime: '23:00',
+              eventLocation: '789 Party Plaza, San Francisco, CA 94105',
+              companyName: 'Celebration Events',
+              contactName: 'Emily Davis',
+              contactEmail: 'emily@celebrationevents.com'
             }
           }
         ]
