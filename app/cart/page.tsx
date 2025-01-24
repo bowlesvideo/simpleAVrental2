@@ -302,44 +302,32 @@ export default function CartPage() {
     try {
       setIsLoading(true)
       
-      // Store current cart items and event details in session storage before checkout
+      // Save cart and event details to session storage in case checkout fails
       sessionStorage.setItem('pending_cart', JSON.stringify(items))
-      const savedEventDetails = localStorage.getItem(EVENT_DETAILS_KEY)
-      if (savedEventDetails) {
-        sessionStorage.setItem('pending_event_details', savedEventDetails)
-      }
-      
-      // Send GA begin_checkout event before redirecting to Stripe
-      const gtag = (window as any).gtag
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'begin_checkout', {
-          currency: 'USD',
-          value: total,
-          items: items.map(item => ({
-            item_id: item.id,
-            item_name: item.name,
-            item_category: item.type === 'package' ? 'Package' : 'Add-on',
-            price: item.price,
-            quantity: item.quantity
-          }))
-        });
-      }
+      sessionStorage.setItem('pending_event_details', JSON.stringify({
+        eventDate: eventDate?.toISOString(),
+        eventStartTime,
+        eventEndTime,
+        eventLocation,
+        street,
+        city,
+        state,
+        zip,
+        companyName,
+        contactName,
+        contactPhone,
+        contactEmail
+      }))
 
-      // Create a checkout session with 50% of the total price
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: items.map(item => ({
-            id: item.id,
-            quantity: item.quantity,
-            type: item.type,
-            price: Math.round(item.price * 0.5 * 100) // Convert 50% of price to cents for Stripe
-          })),
+          items,
           eventDetails: {
-            eventDate,
+            eventDate: eventDate?.toISOString(),
             eventStartTime,
             eventEndTime,
             eventLocation,
@@ -349,33 +337,21 @@ export default function CartPage() {
             zip,
             companyName,
             contactName,
-            contactEmail,
-            contactPhone
+            contactPhone,
+            contactEmail
           }
-        }),
+        })
       })
-
-      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong')
+        throw new Error('Failed to create checkout session')
       }
 
-      // Get Stripe.js instance
-      const stripe = await stripePromise
+      const { url } = await response.json()
+      
+      // Redirect to Stripe without clearing cart
+      window.location.href = url
 
-      if (!stripe) {
-        throw new Error('Stripe failed to initialize')
-      }
-
-      // Redirect to Stripe Checkout
-      const result = await stripe.redirectToCheckout({
-        sessionId: data.sessionId,
-      })
-
-      if (result.error) {
-        throw new Error(result.error.message)
-      }
     } catch (error) {
       console.error('Error in checkout:', error)
       // Remove pending cart if checkout fails

@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { format } from 'date-fns'
 import { Calendar, Clock, Receipt, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import { useCart } from '@/context/cart-context'
 
 interface EventDetails {
   firstName: string;
@@ -27,6 +28,7 @@ interface OrderItem {
 const ConfirmationContent = () => {
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  const { clearCart } = useCart()
   const [loading, setLoading] = useState(true)
   const [eventDetails, setEventDetails] = useState<EventDetails | null>(null)
   const [orderId, setOrderId] = useState<string | null>(null)
@@ -101,18 +103,21 @@ const ConfirmationContent = () => {
               });
             }
           }
-        }
 
-        // Get event details from localStorage
-        const storedEventDetails = localStorage.getItem('event_details')
-        if (storedEventDetails) {
-          setEventDetails(JSON.parse(storedEventDetails))
-        }
+          // Get event details from localStorage
+          const storedEventDetails = localStorage.getItem('event_details')
+          if (storedEventDetails) {
+            setEventDetails(JSON.parse(storedEventDetails))
+          }
 
-        // Clear localStorage in production
-        if (process.env.NODE_ENV === 'production') {
+          // Clear cart using the cart context
+          clearCart()
+          
+          // Clear event details and pending data
           localStorage.removeItem('event_details')
-          localStorage.removeItem('cart')
+          localStorage.removeItem('EVENT_DETAILS_KEY')
+          sessionStorage.removeItem('pending_cart')
+          sessionStorage.removeItem('pending_event_details')
         }
       } catch (error) {
         console.error('Error fetching order details:', error)
@@ -122,7 +127,7 @@ const ConfirmationContent = () => {
     }
 
     fetchOrderDetails()
-  }, [searchParams])
+  }, [searchParams, clearCart])
 
   const formatEventDate = () => {
     if (!eventDetails?.eventDate) return null
