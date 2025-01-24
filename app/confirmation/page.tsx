@@ -33,6 +33,37 @@ const ConfirmationContent = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [total, setTotal] = useState(0)
 
+  // Test function to send sample GA event
+  const sendTestPurchaseEvent = () => {
+    const gtag = (window as any).gtag
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'purchase', {
+        transaction_id: 'TEST-' + Date.now(),
+        value: 5500,
+        currency: 'USD',
+        items: [
+          {
+            item_id: 'pkg_meeting',
+            item_name: 'Meeting Package',
+            item_category: 'Package',
+            price: 2500,
+            quantity: 1
+          },
+          {
+            item_id: 'addon_stream',
+            item_name: 'Live Streaming',
+            item_category: 'Add-on',
+            price: 3000,
+            quantity: 1
+          }
+        ]
+      });
+      console.log('Test purchase event sent to GA');
+    } else {
+      console.error('Google Analytics not loaded');
+    }
+  }
+
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
@@ -50,7 +81,25 @@ const ConfirmationContent = () => {
           setOrderId(data.orderId)
           if (data.items) {
             setOrderItems(data.items)
-            setTotal(data.total || data.items.reduce((sum: number, item: OrderItem) => sum + (item.price * item.quantity), 0))
+            const orderTotal = data.total || data.items.reduce((sum: number, item: OrderItem) => sum + (item.price * item.quantity), 0)
+            setTotal(orderTotal)
+
+            // Send GA purchase event
+            const gtag = (window as any).gtag
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'purchase', {
+                transaction_id: data.orderId,
+                value: orderTotal,
+                currency: 'USD',
+                items: data.items.map((item: OrderItem) => ({
+                  item_id: item.id,
+                  item_name: item.name,
+                  item_category: item.type === 'package' ? 'Package' : 'Add-on',
+                  price: item.price,
+                  quantity: item.quantity
+                }))
+              });
+            }
           }
         }
 
@@ -225,6 +274,15 @@ const ConfirmationContent = () => {
           <div className="text-sm text-gray-400">
             Reference: #{orderId}
           </div>
+          {process.env.NODE_ENV === 'development' && (
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={sendTestPurchaseEvent}
+            >
+              Send Test GA Event
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>
