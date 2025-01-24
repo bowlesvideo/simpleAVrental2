@@ -46,6 +46,13 @@ interface OrderEmailData {
   };
 }
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  company: string;
+  message: string;
+}
+
 export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
   try {
     const eventDate = new Date(data.eventDate);
@@ -258,6 +265,122 @@ export async function sendAdminNotificationEmail(data: OrderEmailData) {
     });
   } catch (error) {
     console.error('Error sending admin notification email:', error);
+    throw error;
+  }
+}
+
+export async function sendContactFormEmails(data: ContactFormData) {
+  try {
+    // Send notification to admin
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: 'New Contact Form Submission',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
+            .container { max-width: 800px; margin: 0 auto; background: white; }
+            .header { background-color: #072948; color: white; padding: 40px; }
+            .logo { height: 40px; margin-bottom: 20px; }
+            .content { padding: 40px; }
+            .details { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 4px; }
+            .footer { background: #f8f9fa; padding: 20px; font-size: 14px; color: #666; text-align: center; }
+            .section-title { color: #072948; font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="Go Video Pro" class="logo">
+              <h1 style="margin: 0;">New Contact Form Submission</h1>
+            </div>
+
+            <div class="content">
+              <div class="details">
+                <div class="section-title">Contact Details</div>
+                <p><strong>Name:</strong> ${data.name}</p>
+                <p><strong>Email:</strong> ${data.email}</p>
+                ${data.company ? `<p><strong>Company:</strong> ${data.company}</p>` : ''}
+                
+                <div class="section-title" style="margin-top: 20px;">Message</div>
+                <p style="white-space: pre-wrap;">${data.message}</p>
+              </div>
+
+              <div class="footer">
+                <div style="margin-bottom: 15px;">This message was sent through the Go Video Pro contact form.</div>
+                <div style="font-size: 12px; color: #666;">
+                  Reply to this email to respond to the customer directly.
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+
+    // Send confirmation to the user
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: data.email,
+      subject: 'Thank you for contacting Go Video Pro',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
+            .container { max-width: 800px; margin: 0 auto; background: white; }
+            .header { background-color: #072948; color: white; padding: 40px; }
+            .logo { height: 40px; margin-bottom: 20px; }
+            .content { padding: 40px; }
+            .message-box { background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 4px; }
+            .footer { background: #f8f9fa; padding: 20px; font-size: 14px; color: #666; text-align: center; }
+            .section-title { color: #072948; font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="Go Video Pro" class="logo">
+              <h1 style="margin: 0;">Thank You for Contacting Us</h1>
+            </div>
+
+            <div class="content">
+              <p>Dear ${data.name},</p>
+              
+              <p>Thank you for reaching out to Go Video Pro. We have received your message and will get back to you within 24-48 hours.</p>
+              
+              <div class="message-box">
+                <div class="section-title">Your Message</div>
+                <p style="white-space: pre-wrap;">${data.message}</p>
+              </div>
+
+              <div style="background: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <div class="section-title">Need Immediate Assistance?</div>
+                <ul style="margin: 0; padding-left: 20px;">
+                  <li>Email us directly at support@govideopro.com</li>
+                  <li>Visit our website at govideopro.com</li>
+                </ul>
+              </div>
+
+              <div class="footer">
+                <div style="margin-bottom: 15px;">Thank you for choosing Go Video Pro!</div>
+                <div style="font-size: 12px; color: #666;">
+                  Questions? Contact us at support@govideopro.com
+                </div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+  } catch (error) {
+    console.error('Error sending contact form emails:', error);
     throw error;
   }
 } 

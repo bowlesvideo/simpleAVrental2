@@ -11,7 +11,6 @@ export function ContactForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
     company: '',
     message: ''
   })
@@ -22,9 +21,17 @@ export function ContactForm() {
     setIsSubmitting(true)
 
     try {
-      // Here you would typically send the form data to your API
-      // For now, we'll just show a success message
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
       
       toast({
         title: "Message Sent",
@@ -34,7 +41,6 @@ export function ContactForm() {
       setFormData({
         name: '',
         email: '',
-        phone: '',
         company: '',
         message: ''
       })
@@ -83,19 +89,6 @@ export function ContactForm() {
           value={formData.email}
           onChange={handleChange}
           required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium mb-2">
-          Phone
-        </label>
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={handleChange}
         />
       </div>
 
