@@ -12,7 +12,18 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useRouter } from 'next/navigation'
 import { marked } from 'marked'
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog"
-import { X } from "lucide-react"
+import { 
+  X,
+  Video,
+  Mic,
+  Cast,
+  Clock,
+  Camera,
+  Volume2,
+  Sun,
+  Users,
+  type LucideIcon 
+} from 'lucide-react'
 
 // Configure marked for GitHub Flavored Markdown
 marked.setOptions({
@@ -159,6 +170,17 @@ const PackageDetails = memo(({
   selectedAddOnIds: string[],
   addOns: AddOn[]
 }) => {
+  const icons: { [key: string]: LucideIcon } = {
+    Video,
+    Mic,
+    Cast,
+    Clock,
+    Camera,
+    Volume2,
+    Sun,
+    Users
+  };
+
   if (!selectedPackage) {
     return (
       <div className="bg-white/5 rounded-lg border border-white/10 p-6 flex items-center justify-center min-h-[400px]">
@@ -243,18 +265,15 @@ const PackageDetails = memo(({
             <div>
               <h3 className="text-lg font-semibold text-[#072948] mb-4">Key Features</h3>
               <div className="space-y-4">
-                {selectedPackage.keyFeatures.map((feature) => (
-                  <div key={feature.icon} className="flex items-center">
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-5 w-5 mr-3 flex-shrink-0 text-[#0095ff]"
-                      fill="currentColor"
-                    >
-                      <path d={featureIcons[feature.icon as keyof typeof featureIcons]} />
-                    </svg>
-                    <span className="text-base text-gray-700">{feature.value}</span>
-                  </div>
-                ))}
+                {selectedPackage.keyFeatures.map((feature) => {
+                  const IconComponent = icons[featureIcons[feature.icon as keyof typeof featureIcons]];
+                  return (
+                    <div key={feature.icon} className="flex items-center">
+                      {IconComponent && <IconComponent className="h-5 w-5 mr-3 flex-shrink-0 text-[#0095ff]" />}
+                      <span className="text-base text-gray-700">{feature.value}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

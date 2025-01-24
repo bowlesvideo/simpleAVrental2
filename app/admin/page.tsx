@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Package, AddOn, PackageFeature } from '@/lib/types'
 import { featureIcons } from '@/lib/constants'
 import React from 'react';
@@ -37,6 +37,25 @@ import { cn } from "@/lib/utils"
 import { useRouter } from 'next/navigation'
 import { toast } from "@/components/ui/use-toast"
 import { format } from 'date-fns'
+import { 
+  GripVertical, 
+  Trash, 
+  Camera, 
+  Video,
+  Mic,
+  Cast,
+  Clock,
+  Volume2,
+  Sun,
+  Users,
+  type LucideIcon 
+} from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface AddOnGroup {
   id: string;
@@ -100,64 +119,88 @@ function SortableFeature({
     transition,
   } = useSortable({ id: `${feature.icon}-${featureIndex}` });
 
+  const [showIconModal, setShowIconModal] = useState(false);
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
+  const icons: { [key: string]: LucideIcon } = {
+    Video,
+    Mic,
+    Cast,
+    Clock,
+    Camera,
+    Volume2,
+    Sun,
+    Users
+  };
+
+  const IconComponent = icons[featureIcons[feature.icon as keyof typeof featureIcons]];
+
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center mb-2 group bg-white/50 backdrop-blur-sm border rounded p-2"
-    >
-      <div
-        {...attributes}
-        {...listeners}
-        className="mr-2 cursor-move"
-      >
-        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M4 8h16M4 16h16" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </div>
-      <span className="mr-2 cursor-pointer relative" onClick={() => toggleIconMenu(packageIndex, featureIndex)}>
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d={featureIcons[feature.icon as keyof typeof featureIcons]} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-        </svg>
-        {iconMenuOpen[`${packageIndex}-${featureIndex}`] && (
-          <div className="absolute left-0 top-full mt-1 bg-white border rounded shadow-lg icon-menu z-10 w-48">
-            {Object.keys(featureIcons).map((iconKey) => (
-              <div
-                key={iconKey}
-                className="flex items-center p-2 cursor-pointer hover:bg-gray-50"
-                onClick={() => handleFeatureIconChange(packageIndex, featureIndex, iconKey as keyof typeof featureIcons)}
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d={featureIcons[iconKey as keyof typeof featureIcons]} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-                </svg>
-                {iconKey}
-              </div>
-            ))}
+    <>
+      <Dialog open={showIconModal} onOpenChange={setShowIconModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choose an Icon</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-4 gap-4 p-4">
+            {Object.entries(featureIcons).map(([key, iconName]) => {
+              const MenuIconComponent = icons[iconName];
+              return (
+                <div
+                  key={key}
+                  onClick={() => {
+                    handleFeatureIconChange(packageIndex, featureIndex, key as keyof typeof featureIcons);
+                    setShowIconModal(false);
+                  }}
+                  className="flex flex-col items-center gap-2 p-3 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  {MenuIconComponent && <MenuIconComponent className="w-8 h-8" />}
+                  <span className="text-xs text-center capitalize">{key.replace(/_/g, ' ')}</span>
+                </div>
+              );
+            })}
           </div>
-        )}
-      </span>
-      <input
-        type="text"
-        value={feature.value}
-        onChange={(e) => handlePackageFeatureChange(packageIndex, featureIndex, e.target.value)}
-        className="flex-1 p-2 border rounded bg-transparent focus:ring-[#0095ff] focus:border-[#0095ff]"
-        placeholder="Enter feature"
-      />
-      <button
-        onClick={() => handleDeleteFeature(packageIndex, featureIndex)}
-        className="ml-2 p-1 text-red-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-        title="Remove feature"
+        </DialogContent>
+      </Dialog>
+
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center mb-2 group bg-white/50 backdrop-blur-sm border rounded p-2 relative"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-        </svg>
-      </button>
-    </div>
+        <div
+          {...attributes}
+          {...listeners}
+          className="mr-2 cursor-move"
+        >
+          <GripVertical className="w-5 h-5 text-gray-400" />
+        </div>
+        <span 
+          className="mr-2 cursor-pointer relative" 
+          onClick={() => setShowIconModal(true)}
+        >
+          {IconComponent && <IconComponent className="w-6 h-6" />}
+        </span>
+        <input
+          type="text"
+          value={feature.value}
+          onChange={(e) => handlePackageFeatureChange(packageIndex, featureIndex, e.target.value)}
+          className="flex-1 p-2 border rounded bg-transparent focus:ring-[#0095ff] focus:border-[#0095ff]"
+          placeholder="Enter feature"
+        />
+        <button
+          onClick={() => handleDeleteFeature(packageIndex, featureIndex)}
+          className="ml-2 p-1 text-red-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Remove feature"
+        >
+          <Trash className="w-5 h-5" />
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -296,11 +339,48 @@ const AdminPage = () => {
     setPackages(updatedPackages);
   };
 
-  const handleFeatureIconChange = (packageIndex: number, featureIndex: number, icon: keyof typeof featureIcons) => {
+  const handleFeatureIconChange = async (packageIndex: number, featureIndex: number, icon: keyof typeof featureIcons) => {
     const updatedPackages = [...packages];
     updatedPackages[packageIndex].keyFeatures[featureIndex].icon = icon;
     setPackages(updatedPackages);
     setIconMenuOpen((prev) => ({ ...prev, [`${packageIndex}-${featureIndex}`]: false }));
+    
+    // Save changes to database
+    try {
+      const response = await fetch('/api/update-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          packages: updatedPackages,
+          addOns: addons,
+          keyFeatures,
+          addonGroups
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save configuration');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Icon updated successfully",
+        });
+      } else {
+        throw new Error(result.error || 'Failed to save configuration');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save icon change",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSavePackage = async (index: number) => {
@@ -754,9 +834,7 @@ const AdminPage = () => {
                                           />
                                         ) : (
                                           <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
-                                            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
+                                            <Camera className="w-6 h-6 mb-1" />
                                             <span className="text-xs">No image</span>
                                           </div>
                                         )}
@@ -808,9 +886,7 @@ const AdminPage = () => {
                                               />
                                             ) : (
                                               <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
-                                                <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
+                                                <Camera className="w-6 h-6 mb-1" />
                                                 <span className="text-xs">No image</span>
                                               </div>
                                             )}
@@ -1194,9 +1270,7 @@ const AdminPage = () => {
                                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-red-600"
                                   title="Move to trash"
                                 >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                                  </svg>
+                                  <Trash className="h-5 w-5" />
                                 </button>
                               </td>
                             </tr>
