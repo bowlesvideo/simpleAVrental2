@@ -183,7 +183,6 @@ const PackageDetails = memo(({
   };
 
   useEffect(() => {
-    // Reset focused image when package changes
     if (selectedPackage?.image) {
       setFocusedImage(selectedPackage.image);
     }
@@ -206,6 +205,28 @@ const PackageDetails = memo(({
     return total + (addon?.price || 0)
   }, 0)
   const totalPrice = selectedPackage.price + addOnTotal
+
+  const PriceAndButton = () => (
+    <div className="flex flex-col">
+      <div>
+        <p className="text-3xl font-bold text-[#072948]">{formatPrice(totalPrice)}</p>
+        {addOnTotal > 0 && (
+          <p className="text-sm text-gray-500 mt-1">
+            Base package: {formatPrice(selectedPackage.price)}
+            <br />
+            Add-ons: +{formatPrice(addOnTotal)}
+          </p>
+        )}
+      </div>
+      <Button
+        size="lg"
+        className="bg-[#0095ff] hover:bg-[#007acc] text-white w-full mt-5 py-6 text-base font-semibold"
+        onClick={() => onChoosePackage(selectedPackage)}
+      >
+        Choose Package
+      </Button>
+    </div>
+  )
 
   return (
     <div className="bg-white rounded-xl">
@@ -263,24 +284,8 @@ const PackageDetails = memo(({
               </>
             )}
             
-            <div className="flex flex-col mt-5 pt-5 border-t">
-              <div>
-                <p className="text-3xl font-bold text-[#072948]">{formatPrice(totalPrice)}</p>
-                {addOnTotal > 0 && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Base package: {formatPrice(selectedPackage.price)}
-                    <br />
-                    Add-ons: +{formatPrice(addOnTotal)}
-                  </p>
-                )}
-              </div>
-              <Button
-                size="lg"
-                className="bg-[#0095ff] hover:bg-[#007acc] text-white w-full mt-5 py-6 text-base font-semibold"
-                onClick={() => onChoosePackage(selectedPackage)}
-              >
-                Choose Package
-              </Button>
+            <div className="hidden lg:flex flex-col mt-5 pt-5 border-t">
+              <PriceAndButton />
             </div>
           </div>
 
@@ -305,6 +310,10 @@ const PackageDetails = memo(({
                   );
                 })}
               </div>
+            </div>
+
+            <div className="lg:hidden flex flex-col mt-8 pt-8 border-t">
+              <PriceAndButton />
             </div>
           </div>
         </div>
