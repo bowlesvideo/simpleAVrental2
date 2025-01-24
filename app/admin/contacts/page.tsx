@@ -12,13 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 interface Contact {
@@ -132,35 +126,33 @@ export default function ContactsPage() {
                   <div className="truncate">{contact.message}</div>
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => window.location.href = `mailto:${contact.email}`}
-                        className="cursor-pointer"
-                      >
-                        <Mail className="mr-2 h-4 w-4" />
-                        Reply via Email
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateStatus(contact.id, 'replied')}
-                        className="cursor-pointer"
-                      >
-                        Mark as Replied
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => updateStatus(contact.id, 'archived')}
-                        className="cursor-pointer text-red-600"
-                      >
-                        Archive
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.location.href = `mailto:${contact.email}`}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Mail className="h-4 w-4" />
+                      <span className="sr-only">Reply via email</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateStatus(contact.id, 'replied')}
+                      className="text-xs"
+                    >
+                      Reply
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateStatus(contact.id, 'archived')}
+                      className="text-xs text-red-600"
+                    >
+                      Archive
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
