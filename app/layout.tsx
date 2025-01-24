@@ -37,6 +37,9 @@ export const metadata: Metadata = {
       alt: 'Professional Video Production Services'
     }]
   },
+  other: {
+    'og:url': SITE_URL
+  },
   alternates: {
     canonical: SITE_URL
   }
