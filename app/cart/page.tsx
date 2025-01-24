@@ -468,13 +468,14 @@ export default function CartPage() {
                   <CardTitle>Event Details</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-6">
-                    <div className="flex-1">
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="w-full lg:flex-1">
+                      <Label className="text-sm font-medium mb-2 block">Event Date</Label>
                       <Calendar
                         mode="single"
                         selected={eventDate}
                         onSelect={(date: Date | undefined) => date && setEventDate(date)}
-                        className="rounded-md border"
+                        className="rounded-md border w-full"
                         disabled={{ before: new Date() }}
                         classNames={{
                           root: "w-full",
@@ -491,10 +492,10 @@ export default function CartPage() {
                           head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                           row: "flex w-full mt-2 justify-between",
                           cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full hover:bg-[#0095ff]/10 hover:text-[#0095ff] focus:bg-[#0095ff]/10 focus:text-[#0095ff] disabled:opacity-50 disabled:pointer-events-none",
                           day_range_end: "day-range-end",
-                          day_selected: "bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground rounded-full [&:not([disabled]):hover]:bg-primary [&:not([disabled]):hover]:text-primary-foreground",
-                          day_today: "bg-accent text-accent-foreground rounded-full",
+                          day_selected: "!bg-[#0095ff] !text-white hover:!bg-[#0095ff] hover:!text-white focus:!bg-[#0095ff] focus:!text-white disabled:!opacity-50 disabled:!pointer-events-none",
+                          day_today: "bg-[#0095ff]/10 text-[#0095ff] rounded-full",
                           day_outside: "text-muted-foreground opacity-50",
                           day_disabled: "text-muted-foreground opacity-50",
                           day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
@@ -502,14 +503,14 @@ export default function CartPage() {
                         }}
                       />
                     </div>
-                    <div className="w-[180px] space-y-4">
+                    <div className="grid grid-cols-2 lg:w-[180px] gap-4">
                       <div className="space-y-1.5">
                         <Label className="text-sm font-medium">Start Time</Label>
                         <Input
                           type="time"
                           value={eventStartTime}
                           onChange={(e) => setEventStartTime(e.target.value)}
-                          className="h-9"
+                          className="h-9 text-base px-2"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -518,7 +519,7 @@ export default function CartPage() {
                           type="time"
                           value={eventEndTime}
                           onChange={(e) => setEventEndTime(e.target.value)}
-                          className="h-9"
+                          className="h-9 text-base px-2"
                         />
                       </div>
                     </div>
