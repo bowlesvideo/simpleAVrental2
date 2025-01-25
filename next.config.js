@@ -5,13 +5,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
+        hostname: '**',
       },
-    ],
-    domains: [
-      'govideopro.com',
-      'octodex.github.com'
-    ],
+      {
+        protocol: 'http',
+        hostname: '**',
+      }
+    ]
   },
   async headers() {
     return [
