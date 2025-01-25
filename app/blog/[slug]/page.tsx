@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
-import { Markdown } from 'react-markdown'
+import ReactMarkdown from 'react-markdown'
 import { prisma } from '@/lib/prisma'
 import { SITE_NAME } from '@/lib/constants'
 import { JsonLd } from '@/components/json-ld'
@@ -124,7 +124,7 @@ export default async function BlogPostPage({ params }: Props) {
           </header>
 
           <div className="prose prose-lg max-w-none">
-            <Markdown>{post.content}</Markdown>
+            <ReactMarkdown>{post.content}</ReactMarkdown>
           </div>
         </div>
       </article>

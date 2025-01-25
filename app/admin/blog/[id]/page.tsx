@@ -29,7 +29,9 @@ async function getBlogPost(id: string) {
       coverImage: '',
       tags: [],
       seoTitle: '',
-      seoDesc: ''
+      seoDesc: '',
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   }
 

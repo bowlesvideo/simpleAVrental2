@@ -59,7 +59,7 @@ export default async function BlogAdminPage() {
               <TableRow key={post.id}>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>
-                  <Badge variant={post.published ? "success" : "secondary"}>
+                  <Badge variant={post.published ? "default" : "secondary"}>
                     {post.published ? "Published" : "Draft"}
                   </Badge>
                 </TableCell>
