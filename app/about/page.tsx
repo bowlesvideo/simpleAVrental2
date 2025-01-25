@@ -27,8 +27,8 @@ export default function AboutPage() {
     "telephone": COMPANY_PHONE,
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "824 Highland Ave",
-      "addressLocality": "Orlando",
+      "streetAddress": "824 HIGHLAND AVE",
+      "addressLocality": "ORLANDO",
       "addressRegion": "FL",
       "postalCode": "32803",
       "addressCountry": "US"

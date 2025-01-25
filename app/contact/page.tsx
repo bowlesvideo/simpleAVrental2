@@ -29,8 +29,8 @@ export default function ContactPage() {
       "telephone": COMPANY_PHONE,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "824 Highland Ave",
-        "addressLocality": "Orlando",
+        "streetAddress": "824 HIGHLAND AVE",
+        "addressLocality": "ORLANDO",
         "addressRegion": "FL",
         "postalCode": "32803",
         "addressCountry": "US"
@@ -75,8 +75,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Office Location</h3>
                   <p className="text-gray-600">
-                    824 Highland Ave<br />
-                    Orlando, FL 32803
+                    824 HIGHLAND AVE<br />
+                    ORLANDO, FL 32803
                   </p>
                 </div>
 
