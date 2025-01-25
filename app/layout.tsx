@@ -61,22 +61,21 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="h-full">
-        {/* Google Analytics */}
-        <script
+        {/* Google Analytics and Google Ads */}
+        <Script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
-              gtag('config', 'AW-16834370291');
-            `,
-          }}
-        />
+        <Script id="google-analytics-ads" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+            gtag('config', 'AW-16834370291');
+          `}
+        </Script>
         <CartProvider>
           <div className="min-h-screen flex flex-col">
             <Header />
