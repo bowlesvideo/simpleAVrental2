@@ -2,7 +2,8 @@ import {
   Home,
   Package,
   Settings,
-  Mail
+  Mail,
+  FileText
 } from "lucide-react"
 
 const items = [
@@ -15,6 +16,11 @@ const items = [
     title: "Orders",
     href: "/admin/orders",
     icon: Package,
+  },
+  {
+    title: "Blog",
+    href: "/admin/blog",
+    icon: FileText,
   },
   {
     title: "Contacts",

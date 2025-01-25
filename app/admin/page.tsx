@@ -717,6 +717,15 @@ const AdminPage = () => {
                   Orders
                 </button>
                 <button
+                  onClick={() => router.push('/admin/blog')}
+                  className={cn(
+                    "px-3 py-2 rounded-md text-sm font-medium",
+                    "text-gray-600 hover:bg-gray-100"
+                  )}
+                >
+                  Blog
+                </button>
+                <button
                   onClick={() => setActiveSection('inventory')}
                   className={cn(
                     "px-3 py-2 rounded-md text-sm font-medium",

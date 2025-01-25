@@ -47,6 +47,12 @@ export function Header() {
                 About
               </Link>
               <Link 
+                href="/blog" 
+                className="text-sm font-medium transition-colors hover:text-[#0095ff]"
+              >
+                Blog
+              </Link>
+              <Link 
                 href="/contact" 
                 className="text-sm font-medium transition-colors hover:text-[#0095ff]"
               >

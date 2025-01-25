@@ -20,3 +20,15 @@ export function generateOrderId() {
   const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
   return `ORD${year}${month}${day}-${random}`
 }
+
+export function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')        // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')    // Remove all non-word chars
+    .replace(/\-\-+/g, '-')      // Replace multiple - with single -
+    .replace(/^-+/, '')          // Trim - from start of text
+    .replace(/-+$/, '')          // Trim - from end of text
+}
