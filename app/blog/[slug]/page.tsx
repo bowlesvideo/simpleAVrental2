@@ -75,7 +75,8 @@ type CodeComponentProps = {
   children: React.ReactNode
 }
 
-const DynamicCodeBlock = dynamic(() => import('@/components/code-block').then(mod => mod.CodeBlock), {
+const DynamicCodeBlock = dynamic(() => import('@/components/code-block'), {
+  loading: () => <div className="animate-pulse bg-gray-200 rounded-lg h-24" />,
   ssr: false
 })
 
