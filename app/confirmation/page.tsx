@@ -101,6 +101,14 @@ const ConfirmationContent = () => {
                   quantity: item.quantity
                 }))
               });
+              
+              // Google Ads conversion tracking
+              gtag('event', 'conversion', {
+                'send_to': 'AW-16834370291/MwZRCKevxJQaEPO1oNs-',
+                'value': orderTotal,
+                'currency': 'USD',
+                'transaction_id': data.orderId
+              });
             }
           }
 
