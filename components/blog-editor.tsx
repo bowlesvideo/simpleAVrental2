@@ -395,15 +395,32 @@ export function BlogEditor({ post }: BlogEditorProps) {
                     ),
                     img: ({ src, alt, title }) => {
                       if (!src) return null
+                      
+                      // Parse size from alt text
+                      let width = 800 // default size (medium)
+                      let height = 400
+                      
+                      if (alt?.toLowerCase() === 'small') {
+                        width = 400
+                        height = 200
+                      } else if (alt?.toLowerCase() === 'large') {
+                        width = 1200
+                        height = 600
+                      }
+                      
                       return (
-                        <div className="my-8 overflow-hidden rounded-lg">
+                        <div className={`my-8 overflow-hidden rounded-lg ${
+                          alt?.toLowerCase() === 'small' ? 'max-w-md' : 
+                          alt?.toLowerCase() === 'large' ? 'max-w-full' : 
+                          'max-w-2xl'
+                        }`}>
                           <Image
                             src={src}
                             alt={alt || ''}
                             title={title || ''}
-                            width={800}
-                            height={400}
-                            className="object-cover"
+                            width={width}
+                            height={height}
+                            className="object-cover w-full"
                           />
                         </div>
                       )
