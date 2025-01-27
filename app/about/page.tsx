@@ -95,11 +95,7 @@ export default function AboutPage() {
           "@type": "Person",
           "name": "Sarah Johnson"
         },
-        "reviewBody": "The team was incredibly professional and the video quality exceeded our expectations.",
-        "publisher": {
-          "@type": "Organization",
-          "name": "TechCorp"
-        }
+        "reviewBody": "The team was incredibly professional and the video quality exceeded our expectations."
       },
       {
         "@type": "Review",
@@ -112,11 +108,7 @@ export default function AboutPage() {
           "@type": "Person",
           "name": "Michael Chen"
         },
-        "reviewBody": "Setup was quick and the live streaming worked flawlessly for our global audience.",
-        "publisher": {
-          "@type": "Organization",
-          "name": "StartupHub"
-        }
+        "reviewBody": "Setup was quick and the live streaming worked flawlessly for our global audience."
       },
       {
         "@type": "Review",
@@ -129,11 +121,7 @@ export default function AboutPage() {
           "@type": "Person",
           "name": "Lisa Rodriguez"
         },
-        "reviewBody": "Next-day delivery of edited content helped us maintain momentum after the event.",
-        "publisher": {
-          "@type": "Organization",
-          "name": "InnovateCo"
-        }
+        "reviewBody": "Next-day delivery of edited content helped us maintain momentum after the event."
       }
     ],
     "aggregateRating": {

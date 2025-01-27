@@ -136,17 +136,17 @@ export function HomeContent() {
       {
         quote: "The team was incredibly professional and the video quality exceeded our expectations.",
         author: "Sarah Johnson",
-        role: "Director of Communications, TechCorp"
+        role: "Director of Communications"
       },
       {
         quote: "Setup was quick and the live streaming worked flawlessly for our global audience.",
         author: "Michael Chen",
-        role: "Event Manager, StartupHub"
+        role: "Event Manager"
       },
       {
         quote: "Next-day delivery of edited content helped us maintain momentum after the event.",
         author: "Lisa Rodriguez",
-        role: "VP of Marketing, InnovateCo"
+        role: "VP of Marketing"
       }
     ]
   }
@@ -186,17 +186,17 @@ export function HomeContent() {
           {
             quote: "The team was incredibly professional and the video quality exceeded our expectations.",
             author: "Sarah Johnson",
-            role: "Director of Communications, TechCorp"
+            role: "Director of Communications"
           },
           {
             quote: "Setup was quick and the live streaming worked flawlessly for our global audience.",
             author: "Michael Chen",
-            role: "Event Manager, StartupHub"
+            role: "Event Manager"
           },
           {
             quote: "Next-day delivery of edited content helped us maintain momentum after the event.",
             author: "Lisa Rodriguez",
-            role: "VP of Marketing, InnovateCo"
+            role: "VP of Marketing"
           }
         ]}
         additionalSchema={structuredData}
@@ -361,17 +361,17 @@ export function HomeContent() {
                 {
                   quote: "The team was incredibly professional and the video quality exceeded our expectations.",
                   author: "Sarah Johnson",
-                  role: "Director of Communications, TechCorp"
+                  role: "Director of Communications"
                 },
                 {
                   quote: "Setup was quick and the live streaming worked flawlessly for our global audience.",
                   author: "Michael Chen",
-                  role: "Event Manager, StartupHub"
+                  role: "Event Manager"
                 },
                 {
                   quote: "Next-day delivery of edited content helped us maintain momentum after the event.",
                   author: "Lisa Rodriguez",
-                  role: "VP of Marketing, InnovateCo"
+                  role: "VP of Marketing"
                 }
               ].map((testimonial, idx) => (
                 <figure key={idx} className="bg-white/5 backdrop-blur-sm rounded-xl p-6 space-y-4">
