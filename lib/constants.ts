@@ -1,4 +1,4 @@
-export const SITE_NAME = 'Go Video Pro'
+export const SITE_NAME = 'VideoPRO'
 export const featureIcons = {
   video: 'Video',
   microphone: 'Mic',
@@ -10,7 +10,7 @@ export const featureIcons = {
   users: 'Users'
 } as const
 
-export const COMPANY_NAME = 'Go Video Pro'
+export const COMPANY_NAME = 'VideoPRO'
 export const COMPANY_EMAIL = 'info@govideopro.com'
 export const COMPANY_ADDRESS = '824 HIGHLAND AVE, ORLANDO, FL 32803'
 

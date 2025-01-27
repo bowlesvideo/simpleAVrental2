@@ -11,15 +11,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: 'Go Video Pro - Professional Corporate Video Production',
+  title: 'VideoPRO - Professional Corporate Video Production',
   description: 'Professional corporate video production at your office. We handle recording, streaming, and next-day delivery of your meetings via Dropbox.',
   keywords: 'corporate video production, video services, meeting recording, live streaming, professional video, office video recording, business video',
   openGraph: {
-    title: 'Go Video Pro - Professional Corporate Video Production',
+    title: 'VideoPRO - Professional Corporate Video Production',
     description: 'Professional corporate video production at your office. We handle recording, streaming, and next-day delivery of your meetings via Dropbox.',
     type: 'website',
     locale: 'en_US',
-    siteName: 'Go Video Pro',
+    siteName: 'VideoPRO',
     images: [
       {
         url: `${SITE_URL}/images/govideopro-opengraph-001.jpg`,
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Go Video Pro - Professional Corporate Video Production',
+    title: 'VideoPRO - Professional Corporate Video Production',
     description: 'Professional corporate video production at your office. We handle recording, streaming, and next-day delivery of your meetings via Dropbox.',
     images: [`${SITE_URL}/images/govideopro-opengraph-001.jpg`],
   },

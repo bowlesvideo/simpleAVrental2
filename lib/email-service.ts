@@ -21,7 +21,7 @@ if (!FROM_EMAIL) {
   console.error('FROM_EMAIL is not set in environment variables. Using default: orders@govideopro.com');
 }
 
-const FROM_EMAIL_DEFAULT = 'Go Video Pro <orders@govideopro.com>';
+const FROM_EMAIL_DEFAULT = 'VideoPRO <orders@govideopro.com>';
 
 interface OrderEmailData {
   orderNumber: string;
@@ -97,7 +97,7 @@ export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="Go Video Pro" class="logo">
+              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="VideoPRO" class="logo">
               <h1 style="margin: 0;">Order Confirmation</h1>
               <div style="margin-top: 10px; font-size: 14px;">Invoice #${data.orderNumber}</div>
             </div>
@@ -207,7 +207,7 @@ export async function sendCustomerConfirmationEmail(data: OrderEmailData) {
               </div>
 
               <div class="footer">
-                <div style="margin-bottom: 15px;">Thank you for choosing Go Video Pro!</div>
+                <div style="margin-bottom: 15px;">Thank you for choosing VideoPRO!</div>
                 <div style="font-size: 12px; color: #666;">
                   Questions? Contact us at support@govideopro.com or call +1 (555) 123-4567
                 </div>
@@ -296,7 +296,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="Go Video Pro" class="logo">
+              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="VideoPRO" class="logo">
               <h1 style="margin: 0;">New Contact Form Submission</h1>
             </div>
 
@@ -312,7 +312,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
               </div>
 
               <div class="footer">
-                <div style="margin-bottom: 15px;">This message was sent through the Go Video Pro contact form.</div>
+                <div style="margin-bottom: 15px;">This message was sent through the VideoPRO contact form.</div>
                 <div style="font-size: 12px; color: #666;">
                   Reply to this email to respond to the customer directly.
                 </div>
@@ -328,7 +328,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
     await resend.emails.send({
       from: FROM_EMAIL || FROM_EMAIL_DEFAULT,
       to: data.email,
-      subject: 'Thank you for contacting Go Video Pro',
+      subject: 'Thank you for contacting VideoPRO',
       html: `
         <!DOCTYPE html>
         <html>
@@ -347,14 +347,14 @@ export async function sendContactFormEmails(data: ContactFormData) {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="Go Video Pro" class="logo">
+              <img src="https://govideopro.com/images/videopro_logo_blue.png" alt="VideoPRO" class="logo">
               <h1 style="margin: 0;">Thank You for Contacting Us</h1>
             </div>
 
             <div class="content">
               <p>Dear ${data.name},</p>
               
-              <p>Thank you for reaching out to Go Video Pro. We have received your message and will get back to you within 24-48 hours.</p>
+              <p>Thank you for reaching out to VideoPRO. We have received your message and will get back to you within 24-48 hours.</p>
               
               <div class="message-box">
                 <div class="section-title">Your Message</div>
@@ -370,7 +370,7 @@ export async function sendContactFormEmails(data: ContactFormData) {
               </div>
 
               <div class="footer">
-                <div style="margin-bottom: 15px;">Thank you for choosing Go Video Pro!</div>
+                <div style="margin-bottom: 15px;">Thank you for choosing VideoPRO!</div>
                 <div style="font-size: 12px; color: #666;">
                   Questions? Contact us at support@govideopro.com
                 </div>

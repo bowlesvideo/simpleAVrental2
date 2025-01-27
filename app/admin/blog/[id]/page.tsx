@@ -5,6 +5,7 @@ import { BlogEditor } from '@/components/blog-editor'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { COMPANY_NAME } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Edit Blog Post',
@@ -56,7 +57,7 @@ export default async function BlogEditPage({ params }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-gray-900">SimpleAV Admin</span>
+              <span className="text-xl font-bold text-gray-900">{COMPANY_NAME} Admin</span>
               <nav className="ml-10 flex space-x-4">
                 <Link 
                   href="/admin"

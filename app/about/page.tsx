@@ -47,12 +47,12 @@ export default function AboutPage() {
       }
     ],
     "sameAs": [
-      "https://www.linkedin.com/company/simpleavrental",
-      "https://www.facebook.com/simpleavrental",
-      "https://twitter.com/simpleavrental",
-      "https://www.instagram.com/simpleavrental",
-      "https://www.youtube.com/channel/simpleavrental"
-    ],
+      process.env.NEXT_PUBLIC_LINKEDIN_URL,
+      process.env.NEXT_PUBLIC_FACEBOOK_URL,
+      process.env.NEXT_PUBLIC_TWITTER_URL,
+      process.env.NEXT_PUBLIC_INSTAGRAM_URL,
+      process.env.NEXT_PUBLIC_YOUTUBE_URL
+    ].filter(Boolean),
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": "Video Production Services",

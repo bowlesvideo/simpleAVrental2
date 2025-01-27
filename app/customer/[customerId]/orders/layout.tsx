@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Your Orders - Go Video Pro',
+  title: 'Your Orders - VideoPRO',
   description: 'View your order history and event details',
 }
 

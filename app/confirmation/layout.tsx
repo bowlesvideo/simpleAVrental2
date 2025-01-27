@@ -1,12 +1,15 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Order Confirmation - Go Video Pro',
-  description: 'Thank you for your order with Go Video Pro. Your payment has been processed successfully.',
-  robots: 'noindex',
+  title: 'Order Confirmation - VideoPRO',
+  description: 'Thank you for your order with VideoPRO. Your payment has been processed successfully.',
+  robots: {
+    index: false,
+    follow: false,
+  },
   openGraph: {
-    title: 'Order Confirmation - Go Video Pro',
-    description: 'Thank you for your order with Go Video Pro',
+    title: 'Order Confirmation - VideoPRO',
+    description: 'Thank you for your order with VideoPRO',
     type: 'website',
   }
 }

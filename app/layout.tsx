@@ -14,12 +14,12 @@ const SITE_URL = getBaseUrl()
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Go Video Pro - Professional Corporate Video Production',
-    template: `%s | Go Video Pro`,
+    default: 'VideoPRO - Professional Corporate Video Production',
+    template: `%s | VideoPRO`,
   },
   description: 'Professional corporate video production at your office. We handle recording, streaming, and next-day delivery of your meetings via Dropbox.',
   keywords: 'corporate video, video production, meeting recording, live streaming, professional video, office video recording, business video',
-  authors: [{ name: 'Go Video Pro' }],
+  authors: [{ name: 'VideoPRO' }],
   category: 'Video Production',
   icons: {
     icon: '/favicon.ico',
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
-    siteName: 'Go Video Pro',
-    title: 'Go Video Pro - Professional Corporate Video Production',
+    siteName: 'VideoPRO',
+    title: 'VideoPRO - Professional Corporate Video Production',
     description: 'Professional corporate video production at your office. We handle recording, streaming, and next-day delivery of your meetings via Dropbox.',
     images: [{
       url: `${SITE_URL}/images/govideopro-opengraph-001.jpg`,

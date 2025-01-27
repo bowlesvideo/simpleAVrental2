@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { COMPANY_NAME } from '@/lib/constants'
 
 const OrdersPage = () => {
   const router = useRouter();
@@ -36,7 +37,7 @@ const OrdersPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <span className="text-xl font-bold text-gray-900">SimpleAV Admin</span>
+              <span className="text-xl font-bold text-gray-900">{COMPANY_NAME} Admin</span>
               <nav className="ml-10 flex space-x-4">
                 <button
                   onClick={() => router.push('/admin')}

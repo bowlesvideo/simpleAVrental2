@@ -81,11 +81,11 @@ export async function POST(request: Request) {
 
     // Send email with magic link
     await resend.emails.send({
-      from: 'Go Video Pro <orders@govideopro.com>',
+      from: 'VideoPRO <orders@govideopro.com>',
       to: [email],
       subject: 'Your Login Link',
       html: `
-        <h2>Welcome to Go Video Pro!</h2>\n
+        <h2>Welcome to VideoPRO!</h2>\n
         <p>Click the link below to view your orders. This link will expire in 15 minutes.</p>\n
         <p><a href="${magicLink}">View My Orders</a></p>
       `
