@@ -3,10 +3,36 @@ import { prisma } from '@/lib/prisma'
 import type { RentalConfig, Package, AddOn } from '@/lib/types'
 import { Prisma } from '@prisma/client'
 
+// Route Segment Config
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
     console.log('Starting config update...')
-    const updatedConfig: RentalConfig = await request.json()
+    
+    if (!request.body) {
+      throw new Error('Request body is empty')
+    }
+    
+    let updatedConfig: RentalConfig
+    try {
+      // First try the standard way
+      updatedConfig = await request.json()
+    } catch (error) {
+      console.log('Standard parsing failed, trying stream reading...')
+      // Fallback to stream reading if the payload is too large
+      const chunks = []
+      const reader = request.body.getReader()
+      
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        chunks.push(value)
+      }
+      
+      const buffer = Buffer.concat(chunks)
+      updatedConfig = JSON.parse(buffer.toString())
+    }
     
     // Log the full request data
     console.log('Received update request:', {

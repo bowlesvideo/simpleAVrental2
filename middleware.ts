@@ -43,6 +43,15 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Only apply to /api/update-config
+  if (path === '/api/update-config') {
+    return NextResponse.next({
+      headers: {
+        'Transfer-Encoding': 'chunked',
+      },
+    })
+  }
+
   return NextResponse.next()
 }
 
@@ -52,5 +61,6 @@ export const config = {
     '/auth/signup',
     '/customer/:path*',
     '/api/admin/:path*',
+    '/api/:path*',
   ]
 }

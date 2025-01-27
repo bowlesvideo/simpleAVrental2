@@ -11,7 +11,8 @@ const nextConfig = {
         protocol: 'http',
         hostname: '**',
       }
-    ]
+    ],
+    domains: ['res.cloudinary.com'],
   },
   async headers() {
     return [
