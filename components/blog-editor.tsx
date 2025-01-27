@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,20 +18,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { slugify } from '@/lib/utils'
+import Image from 'next/image'
 
 const formSchema = z.object({
-  id: z.string().optional(),
-  title: z.string().min(1, 'Title is required'),
-  slug: z.string().min(1, 'Slug is required'),
-  excerpt: z.string().nullable(),
-  content: z.string().min(1, 'Content is required'),
-  coverImage: z.string().nullable(),
-  published: z.boolean().default(false),
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  excerpt: z.string().optional().default(''),
+  content: z.string().min(1),
+  coverImage: z.string().optional().default(''),
+  published: z.boolean(),
   publishedAt: z.date().nullable(),
-  author: z.string().nullable(),
-  tags: z.array(z.string()).default([]),
-  seoTitle: z.string().nullable(),
-  seoDesc: z.string().nullable(),
+  author: z.string().optional().default(''),
+  tags: z.array(z.string()),
+  seoTitle: z.string().optional().default(''),
+  seoDesc: z.string().optional().default('')
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -96,6 +98,10 @@ interface BlogEditorProps {
 export function BlogEditor({ post }: BlogEditorProps) {
   const router = useRouter()
   const [isSaving, setIsSaving] = useState(false)
+  const [mode, setMode] = useState<'content' | 'preview' | 'seo'>('content')
+  
+  const defaultContent = post?.content ?? ''
+  const [content, setContent] = useState(defaultContent)
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -103,7 +109,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
       title: post?.title ?? '',
       slug: post?.slug ?? '',
       excerpt: post?.excerpt ?? '',
-      content: post?.content ?? '',
+      content: defaultContent,
       coverImage: post?.coverImage ?? '',
       published: post?.published ?? false,
       publishedAt: post?.publishedAt ?? null,
@@ -113,6 +119,15 @@ export function BlogEditor({ post }: BlogEditorProps) {
       seoDesc: post?.seoDesc ?? ''
     }
   })
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'content') {
+        setContent(value.content ?? '')
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   async function onSubmit(data: FormValues) {
     try {
@@ -157,7 +172,7 @@ export function BlogEditor({ post }: BlogEditorProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">
             {post?.id === 'new' ? 'New Post' : 'Edit Post'}
           </h1>
@@ -183,51 +198,60 @@ export function BlogEditor({ post }: BlogEditorProps) {
           </div>
         </div>
 
-        <Tabs defaultValue="content">
-          <TabsList>
-            <TabsTrigger value="content">Content</TabsTrigger>
-            <TabsTrigger value="seo">SEO</TabsTrigger>
-          </TabsList>
+        <div className="flex gap-4 mb-6">
+          <Button
+            type="button"
+            variant={mode === 'content' ? 'default' : 'outline'}
+            onClick={() => setMode('content')}
+          >
+            Edit Content
+          </Button>
+          <Button
+            type="button"
+            variant={mode === 'preview' ? 'default' : 'outline'}
+            onClick={() => setMode('preview')}
+          >
+            Preview
+          </Button>
+          <Button
+            type="button"
+            variant={mode === 'seo' ? 'default' : 'outline'}
+            onClick={() => setMode('seo')}
+          >
+            SEO Settings
+          </Button>
+        </div>
 
-          <TabsContent value="content" className="space-y-4">
+        {mode === 'content' && (
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="title"
-                render={({ field }: { field: InputFieldProps['field'] }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input {...field} onChange={(e) => {
-                        field.onChange(e)
-                        if (!form.getValues('slug')) {
-                          form.setValue('slug', slugify(e.target.value))
-                        }
-                      }} />
+                      <Input placeholder="Post title" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="slug"
-                render={({ field }: { field: InputFieldProps['field'] }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Slug</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="post-slug" {...field} value={field.value || ''} />
                     </FormControl>
-                    <FormDescription>
-                      The URL-friendly version of the title
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-
             <FormField
               control={form.control}
               name="excerpt"
@@ -235,38 +259,35 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 <FormItem>
                   <FormLabel>Excerpt</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      {...field} 
+                    <Textarea
+                      placeholder="Brief excerpt of the post"
+                      className="resize-none"
+                      {...field}
                       value={field.value || ''}
-                      placeholder="Brief summary of the post" 
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="content"
-              render={({ field }: { field: TextareaFieldProps['field'] }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      {...field} 
+                    <Textarea
+                      placeholder="Write your post content in markdown..."
                       className="min-h-[400px] font-mono"
-                      placeholder="Write your post content in markdown"
+                      {...field}
+                      value={field.value || ''}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Supports markdown formatting
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="coverImage"
@@ -274,85 +295,175 @@ export function BlogEditor({ post }: BlogEditorProps) {
                 <FormItem>
                   <FormLabel>Cover Image URL</FormLabel>
                   <FormControl>
-                    <Input {...field} value={field.value || ''} />
+                    <Input 
+                      placeholder="https://example.com/image.jpg" 
+                      {...field} 
+                      value={field.value || ''} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="author"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Author</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Author name" 
+                      {...field} 
+                      value={field.value || ''} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="tags"
-              render={({ field }: { field: TagsFieldProps['field'] }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
-                    <Input 
-                      {...field} 
+                    <Input
+                      placeholder="Comma-separated tags"
                       value={field.value.join(', ')}
-                      onChange={(e) => {
-                        const tags = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean)
-                        form.setValue('tags', tags)
-                      }}
-                      placeholder="tag1, tag2, tag3" 
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value
+                            .split(',')
+                            .map((tag) => tag.trim())
+                            .filter(Boolean)
+                        )
+                      }
                     />
                   </FormControl>
-                  <FormDescription>
-                    Separate tags with commas
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="seo" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>SEO Settings</CardTitle>
-                <CardDescription>
-                  Optimize your post for search engines
+        {mode === 'preview' && (
+          <Card className="min-h-[600px] bg-white">
+            <CardHeader className="space-y-4">
+              <CardTitle className="text-4xl font-bold">
+                {form.getValues('title') || 'Post Preview'}
+              </CardTitle>
+              {form.getValues('excerpt') && (
+                <CardDescription className="text-xl text-muted-foreground">
+                  {form.getValues('excerpt')}
                 </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="seoTitle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>SEO Title</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ''} />
-                      </FormControl>
-                      <FormDescription>
-                        Override the default title tag
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-lg prose-slate max-w-none dark:prose-invert">
+                <ReactMarkdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    h1: ({ children }) => <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>,
+                    p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-2">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-2">{children}</ol>,
+                    li: ({ children }) => <li className="ml-4">{children}</li>,
+                    a: ({ href, children }) => (
+                      <a href={href} className="text-primary hover:underline">
+                        {children}
+                      </a>
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className="border-l-4 border-primary pl-4 italic my-4">
+                        {children}
+                      </blockquote>
+                    ),
+                    code: ({ children }) => (
+                      <code className="bg-muted px-1.5 py-0.5 rounded-sm font-mono text-sm">
+                        {children}
+                      </code>
+                    ),
+                    pre: ({ children }) => (
+                      <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4 font-mono text-sm">
+                        {children}
+                      </pre>
+                    ),
+                    img: ({ src, alt, title }) => {
+                      if (!src) return null
+                      return (
+                        <div className="my-8 overflow-hidden rounded-lg">
+                          <Image
+                            src={src}
+                            alt={alt || ''}
+                            title={title || ''}
+                            width={800}
+                            height={400}
+                            className="object-cover"
+                          />
+                        </div>
+                      )
+                    },
+                  }}
+                >
+                  {content}
+                </ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-                <FormField
-                  control={form.control}
-                  name="seoDesc"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Meta Description</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} value={field.value || ''} />
-                      </FormControl>
-                      <FormDescription>
-                        Brief description for search results
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {mode === 'seo' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>SEO Settings</CardTitle>
+              <CardDescription>
+                Optimize your post for search engines
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="seoTitle"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="SEO-optimized title"
+                        {...field}
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="seoDesc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SEO Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="SEO-optimized description"
+                        className="resize-none"
+                        {...field}
+                        value={field.value || ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        )}
       </form>
     </Form>
   )
