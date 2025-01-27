@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { ContactForm } from '@/components/contact-form'
 import { JsonLd } from '@/components/json-ld'
-import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_PHONE, COMPANY_ADDRESS } from '@/lib/constants'
+import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_ADDRESS } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: `Contact ${SITE_NAME} - Get in Touch for Professional Video Services`,
@@ -26,7 +26,6 @@ export default function ContactPage() {
       "@type": "Organization",
       "name": COMPANY_NAME,
       "email": COMPANY_EMAIL,
-      "telephone": COMPANY_PHONE,
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "824 HIGHLAND AVE",
@@ -38,7 +37,6 @@ export default function ContactPage() {
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer service",
-        "telephone": COMPANY_PHONE,
         "email": COMPANY_EMAIL,
         "availableLanguage": "English",
         "hoursAvailable": [

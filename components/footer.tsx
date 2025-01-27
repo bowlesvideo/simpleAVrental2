@@ -1,4 +1,4 @@
-import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_PHONE, COMPANY_ADDRESS } from '@/lib/constants'
+import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_ADDRESS } from '@/lib/constants'
 
 export function Footer() {
   return (
@@ -43,12 +43,6 @@ export function Footer() {
                 <li className="text-gray-300">
                   <span className="block font-semibold text-white">Address:</span>
                   {COMPANY_ADDRESS}
-                </li>
-                <li className="text-gray-300">
-                  <span className="block font-semibold text-white">Phone:</span>
-                  <a href={`tel:${COMPANY_PHONE}`} className="hover:text-white transition-colors">
-                    {COMPANY_PHONE}
-                  </a>
                 </li>
                 <li className="text-gray-300">
                   <span className="block font-semibold text-white">Email:</span>

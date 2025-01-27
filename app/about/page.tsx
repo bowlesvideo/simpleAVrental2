@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Metadata } from 'next'
-import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_PHONE, COMPANY_ADDRESS } from '@/lib/constants'
+import { SITE_NAME, COMPANY_NAME, COMPANY_EMAIL, COMPANY_ADDRESS } from '@/lib/constants'
 import { JsonLd } from '@/components/json-ld'
 
 export const metadata: Metadata = {
@@ -24,7 +24,6 @@ export default function AboutPage() {
     "name": COMPANY_NAME,
     "image": "/images/office2.jpg",
     "email": COMPANY_EMAIL,
-    "telephone": COMPANY_PHONE,
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "824 HIGHLAND AVE",
@@ -275,9 +274,6 @@ export default function AboutPage() {
                 <div className="space-y-2">
                   <p className="text-gray-600">
                     <strong className="text-[#072948]">Email:</strong> {COMPANY_EMAIL}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong className="text-[#072948]">Phone:</strong> {COMPANY_PHONE}
                   </p>
                   <p className="text-gray-600">
                     <strong className="text-[#072948]">Address:</strong><br />

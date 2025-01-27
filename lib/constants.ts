@@ -12,7 +12,6 @@ export const featureIcons = {
 
 export const COMPANY_NAME = 'Go Video Pro'
 export const COMPANY_EMAIL = 'info@govideopro.com'
-export const COMPANY_PHONE = '(555) 123-4567'
 export const COMPANY_ADDRESS = '824 HIGHLAND AVE, ORLANDO, FL 32803'
 
 export const getBaseUrl = () => {
