@@ -85,7 +85,7 @@ const PackageButtons = memo(({
           )}
         >
           <h3 className="text-sm lg:text-base font-semibold text-white">
-            {pkg.name.replace(' Package', '')}
+            {pkg.name}
           </h3>
           <p className="hidden lg:block text-xs text-white/70 mt-0.5">
             Starting at {formatPrice(pkg.price)}

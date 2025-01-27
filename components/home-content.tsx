@@ -206,10 +206,10 @@ export function HomeContent() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center mb-4">
               <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white tracking-tight">
-                Corporate Video Production
+                Orlando Corporate Video Production
               </h1>              
               <p className="text-lg sm:text-xl text-gray-200 leading-relaxed">
-                When you have a meeting that needs to be recorded, we come to your office, professionally capture (and stream) your meeting, and deliver a shareable Dropbox link to you the next day.
+                From booking to delivery, we make corporate video production simple. Our Orlando-based team handles everything - setup, recording, streaming, and next-day delivery of your content. Just book online and we'll take care of the rest.
               </p>
             </div>
           </div>
