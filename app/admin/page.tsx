@@ -48,7 +48,8 @@ import {
   Volume2,
   Sun,
   Users,
-  type LucideIcon 
+  type LucideIcon,
+  ExternalLink,
 } from 'lucide-react'
 import {
   Dialog,
@@ -56,6 +57,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import Link from 'next/link'
 
 interface AddOnGroup {
   id: string;
@@ -1290,13 +1292,38 @@ const AdminPage = () => {
                   </div>
                 ) : selectedOrder ? (
                   <div className="space-y-8">
+                    {/* Order Header */}
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-semibold">Order #{selectedOrder.id}</h3>
+                        <p className="text-gray-600 mt-1">Purchased on {format(new Date(selectedOrder.orderDate), 'MMMM d, yyyy')}</p>
+                        {selectedOrder.eventDetails.paymentIntent && (
+                          <Link 
+                            href={`https://dashboard.stripe.com/payments/${selectedOrder.eventDetails.paymentIntent}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:text-blue-700 inline-flex items-center gap-1 mt-2"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            View Payment on Stripe
+                          </Link>
+                        )}
+                      </div>
+                      <Badge variant="secondary" className={
+                        selectedOrder.status === 'trashed' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }>
+                        {selectedOrder.status}
+                      </Badge>
+                    </div>
+
                     {/* Order Details Content */}
                     <div className="grid grid-cols-2 gap-8">
                       <Card>
                         <CardContent className="pt-6">
                           <h3 className="text-lg font-semibold mb-4">Event Details</h3>
                           <div className="space-y-2 text-gray-600">
-                            <p><span className="font-medium">Date:</span> {format(new Date(selectedOrder.eventDate), 'MMMM d, yyyy')}</p>
+                            <p><span className="font-medium">Event Date:</span> {format(new Date(selectedOrder.eventDate), 'MMMM d, yyyy')}</p>
                             <p><span className="font-medium">Time:</span> {selectedOrder.eventDetails.eventStartTime} to {selectedOrder.eventDetails.eventEndTime}</p>
                             <p><span className="font-medium">Location:</span> {selectedOrder.eventDetails.eventLocation}</p>
                           </div>
