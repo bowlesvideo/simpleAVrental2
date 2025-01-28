@@ -643,6 +643,32 @@ const AdminPage = () => {
     }
   };
 
+  const handlePermanentDelete = async (orderId: string) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+      
+      // Remove the order from the list
+      setOrders(orders.filter(order => order.id !== orderId));
+      toast({
+        title: "Order Deleted",
+        description: "The order has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the order. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const fetchOrderDetails = async (orderId: string) => {
     try {
       const response = await fetch(`/api/orders/${orderId}`);
@@ -1273,16 +1299,36 @@ const AdminPage = () => {
                               </td>
                               <td className="px-4 py-3 text-right">${order.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                               <td className="px-4 py-3">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleTrashOrder(order.id);
-                                  }}
-                                  className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-red-600"
-                                  title="Move to trash"
-                                >
-                                  <Trash className="h-5 w-5" />
-                                </button>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  {order.status !== 'trashed' && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleTrashOrder(order.id);
+                                      }}
+                                      className="text-gray-400 hover:text-red-600"
+                                      title="Move to trash"
+                                    >
+                                      <Trash className="h-5 w-5" />
+                                    </button>
+                                  )}
+                                  {order.status === 'trashed' && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.confirm('Are you sure you want to permanently delete this order? This action cannot be undone.')) {
+                                          handlePermanentDelete(order.id);
+                                        }
+                                      }}
+                                      className="text-gray-400 hover:text-red-800"
+                                      title="Permanently delete"
+                                    >
+                                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
