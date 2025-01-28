@@ -40,18 +40,29 @@ export async function POST(request: Request) {
       )
     }
 
-    const lineItems = items.map((item: { id: string; quantity: number; type: 'package' | 'addon'; price: number }) => {
+    const lineItems = await Promise.all(items.map(async (item: { id: string; quantity: number; type: 'package' | 'addon'; price: number }) => {
+      let name = item.type === 'package' ? 'Package' : 'Add-on';
+      
+      // Look up the actual name based on type
+      if (item.type === 'package') {
+        const pkg = await getPackageBySlug(item.id);
+        if (pkg) name = pkg.name;
+      } else {
+        const addon = await getAddOnByValue(item.id);
+        if (addon) name = addon.name;
+      }
+
       return {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${item.type === 'package' ? 'Package' : 'Add-on'}: ${item.id} (50% Deposit)`,
+            name: `${name} (50% Deposit)`,
           },
           unit_amount: item.price, // Price is already in cents and halved from the client
         },
         quantity: item.quantity,
       }
-    })
+    }))
 
     // Generate order ID for this session
     const orderId = generateOrderId()

@@ -1414,7 +1414,7 @@ const AdminPage = () => {
                                   </ul>
                                 )}
                               </div>
-                              <p className="text-lg font-semibold">${(item.price / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                              <p className="text-lg font-semibold">${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                             </div>
                           </div>
                         ))}
@@ -1428,7 +1428,7 @@ const AdminPage = () => {
                               .map((item: any) => (
                               <div key={item.id} className="flex justify-between items-center py-2">
                                 <span className="text-gray-600">{item.name}</span>
-                                <span className="font-semibold">${((item.price * item.quantity) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span className="font-semibold">${(item.price * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                               </div>
                             ))}
                           </div>
