@@ -1452,11 +1452,16 @@ export default function CartPage() {
             </div>
 
             <div className="lg:col-span-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Complete Order</CardTitle>
+              <Card className="bg-blue-50/50 border-[#0095ff]/20 shadow-lg">
+                <CardHeader className="border-b border-[#0095ff]/10">
+                  <CardTitle className="text-[#072948] flex items-center gap-2">
+                    <svg className="w-5 h-5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Complete Order
+                  </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="mt-4">
                   <div className="space-y-6">
                     {/* Order Summary */}
                     <div className="space-y-4">
@@ -1510,13 +1515,38 @@ export default function CartPage() {
 
                     {/* Terms and Checkout */}
                     <div className="space-y-4">
-                      <div className="bg-blue-50 p-4 rounded-lg text-sm text-gray-600">
-                        <p>By clicking "Complete Order" you agree to our <a href="/terms" className="text-[#0095ff] hover:underline">Terms of Service</a> and acknowledge that:</p>
-                        <ul className="mt-2 space-y-1 list-disc list-inside">
-                          <li>50% of the total amount will be charged today</li>
-                          <li>The remaining 50% will be charged on the day of delivery</li>
-                          <li>Cancellations must be made at least 48 hours before the event</li>
-                        </ul>
+                      <div className="bg-white border-2 border-[#0095ff]/20 p-5 rounded-lg">
+                        <div className="flex items-start gap-3 mb-4">
+                          <svg className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <p className="font-medium text-[#072948] mb-1">Important Notice:</p>
+                            <p className="text-sm text-gray-700">
+                              By clicking "Complete Order" you agree to our <a href="/terms" className="text-[#0095ff] hover:underline font-semibold">Terms of Service</a> and acknowledge the following:
+                            </p>
+                          </div>
+                        </div>
+                        <div className="space-y-3 pl-8">
+                          <div className="flex items-start gap-2 text-sm text-gray-700">
+                            <svg className="w-5 h-5 mt-0.5 text-[#0095ff] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>50% of the total amount will be charged today</span>
+                          </div>
+                          <div className="flex items-start gap-2 text-sm text-gray-700">
+                            <svg className="w-5 h-5 mt-0.5 text-[#0095ff] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>The remaining 50% will be charged on the day of delivery</span>
+                          </div>
+                          <div className="flex items-start gap-2 text-sm text-gray-700">
+                            <svg className="w-5 h-5 mt-0.5 text-[#0095ff] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Cancellations must be made at least 48 hours before the event</span>
+                          </div>
+                        </div>
                       </div>
                       
                       <Button 
