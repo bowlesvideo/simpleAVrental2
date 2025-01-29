@@ -135,6 +135,16 @@ function getTenBusinessDaysAhead(): Date {
   return date
 }
 
+// Add this helper function near the top of the file
+const formatTimeToAMPM = (time: string) => {
+  if (!time) return '';
+  const [hour] = time.split(':');
+  const hourNum = parseInt(hour);
+  const ampm = hourNum < 12 ? 'AM' : 'PM';
+  const hour12 = hourNum % 12 || 12;
+  return `${hour12}:00 ${ampm}`;
+};
+
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart, addPackage, addAddOn } = useCart()
   const { toast } = useToast()
@@ -814,10 +824,12 @@ export default function CartPage() {
                           >
                             <option value="">Select start time</option>
                             {Array.from({ length: 24 }, (_, i) => {
-                              const hour = i.toString().padStart(2, '0')
+                              const hour = i % 12 || 12
+                              const ampm = i < 12 ? 'AM' : 'PM'
+                              const value = `${i.toString().padStart(2, '0')}:00`
                               return (
-                                <option key={hour} value={`${hour}:00`}>
-                                  {`${hour}:00`}
+                                <option key={value} value={value}>
+                                  {`${hour}:00 ${ampm}`}
                                 </option>
                               )
                             })}
@@ -846,10 +858,12 @@ export default function CartPage() {
                           >
                             <option value="">Select end time</option>
                             {Array.from({ length: 24 }, (_, i) => {
-                              const hour = i.toString().padStart(2, '0')
+                              const hour = i % 12 || 12
+                              const ampm = i < 12 ? 'AM' : 'PM'
+                              const value = `${i.toString().padStart(2, '0')}:00`
                               return (
-                                <option key={hour} value={`${hour}:00`}>
-                                  {`${hour}:00`}
+                                <option key={value} value={value}>
+                                  {`${hour}:00 ${ampm}`}
                                 </option>
                               )
                             })}
@@ -1328,71 +1342,156 @@ export default function CartPage() {
         )}
 
         {step === 3 && (
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Review order">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Review and checkout">
             <div className="lg:col-span-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Review Your Order</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2">
+                    <span>Review Order</span>
+                    <span className="text-sm font-normal text-[#0095ff]">Step 3 of 3</span>
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Please review your order details before proceeding to checkout.
+                  </p>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold mb-2">Event Details</h3>
-                    <div className="space-y-1 text-sm">
-                      <p>Date: {eventDate ? format(eventDate, 'MMMM d, yyyy') : 'Not selected'}</p>
-                      <p>Time: {eventStartTime} - {eventEndTime}</p>
-                      <p>Location: {eventLocation}</p>
-                      <p>Address: {street}</p>
-                      <p>{city}, {state} {zip}</p>
+                <CardContent>
+                  <div className="space-y-8">
+                    {/* Event Details Review */}
+                    <div>
+                      <h3 className="font-medium text-[#072948] mb-3">Event Details</h3>
+                      <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Date:</span>
+                          <span className="font-medium">{eventDate?.toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Time:</span>
+                          <span className="font-medium">
+                            {formatTimeToAMPM(eventStartTime)} - {formatTimeToAMPM(eventEndTime)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Location:</span>
+                          <span className="font-medium text-right">{eventLocation}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-2">Contact Information</h3>
-                    <div className="space-y-1 text-sm">
-                      <p>Company: {companyName}</p>
-                      <p>Contact: {contactName}</p>
-                      <p>Email: {contactEmail}</p>
-                      <p>Phone: {contactPhone}</p>
+
+                    {/* Contact Information Review */}
+                    <div>
+                      <h3 className="font-medium text-[#072948] mb-3">Contact Information</h3>
+                      <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Company:</span>
+                          <span className="font-medium">{companyName}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Contact:</span>
+                          <span className="font-medium">{contactName}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Email:</span>
+                          <span className="font-medium">{contactEmail}</span>
+                        </div>
+                        {contactPhone && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Phone:</span>
+                            <span className="font-medium">{contactPhone}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Communication Schedule */}
+                    <div>
+                      <h3 className="font-medium text-[#072948] mb-3">What Happens Next</h3>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <ol className="space-y-3 text-sm">
+                          <li className="flex items-start gap-3">
+                            <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-[#0095ff] text-white font-medium text-xs">
+                              1
+                            </div>
+                            <div>
+                              <p className="font-medium text-[#072948]">Immediate</p>
+                              <p className="text-gray-600">Order confirmation email with receipt</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-[#0095ff] text-white font-medium text-xs">
+                              2
+                            </div>
+                            <div>
+                              <p className="font-medium text-[#072948]">Within 24 Hours</p>
+                              <p className="text-gray-600">Our team will review and confirm all details</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-[#0095ff] text-white font-medium text-xs">
+                              3
+                            </div>
+                            <div>
+                              <p className="font-medium text-[#072948]">48 Hours Before Event</p>
+                              <p className="text-gray-600">Setup schedule and final coordination details</p>
+                            </div>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <div className="flex-none flex items-center justify-center w-6 h-6 rounded-full bg-[#0095ff] text-white font-medium text-xs">
+                              4
+                            </div>
+                            <div>
+                              <p className="font-medium text-[#072948]">Event Day</p>
+                              <p className="text-gray-600">On-site coordination and technical support</p>
+                            </div>
+                          </li>
+                        </ol>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
             <div className="lg:col-span-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                  <CardTitle>Complete Order</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {packages.length > 0 && (
-                      <section aria-label="Selected packages" className="space-y-2">
-                        <h3 className="font-medium text-sm text-gray-500">Packages</h3>
-                        {packages.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center">
-                            <span>{item.name}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="px-3 py-1">{item.quantity}x</span>
-                              <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                    {/* Order Summary */}
+                    <div className="space-y-4">
+                      {packages.length > 0 && (
+                        <section aria-label="Selected packages" className="space-y-2">
+                          <h3 className="font-medium text-sm text-gray-500">Packages</h3>
+                          {packages.map((item) => (
+                            <div key={item.id} className="flex justify-between items-center">
+                              <span>{item.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="px-3 py-1">{item.quantity}x</span>
+                                <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </section>
-                    )}
-                    {addons.length > 0 && (
-                      <section aria-label="Selected add-ons" className="space-y-2">
-                        <h3 className="font-medium text-sm text-gray-500">Add-ons</h3>
-                        {addons.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center">
-                            <span>{item.name}</span>
-                            <div className="flex items-center gap-2">
-                              <span className="px-3 py-1">{item.quantity}x</span>
-                              <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                          ))}
+                        </section>
+                      )}
+                      {addons.length > 0 && (
+                        <section aria-label="Selected add-ons" className="space-y-2">
+                          <h3 className="font-medium text-sm text-gray-500">Add-ons</h3>
+                          {addons.map((item) => (
+                            <div key={item.id} className="flex justify-between items-center">
+                              <span>{item.name}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="px-3 py-1">{item.quantity}x</span>
+                                <span>${Math.round(item.price * item.quantity).toLocaleString()}</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </section>
-                    )}
-                    <section aria-label="Order total" className="pt-4 border-t">
+                          ))}
+                        </section>
+                      )}
+                    </div>
+
+                    {/* Payment Summary */}
+                    <div className="border-t pt-4">
                       <div className="flex justify-between text-lg font-semibold">
                         <span>Total</span>
                         <span>${Math.round(total).toLocaleString()}</span>
@@ -1407,16 +1506,37 @@ export default function CartPage() {
                           <span>${Math.round(total * 0.5).toLocaleString()}</span>
                         </div>
                       </div>
-                      <div className="mt-6">
-                        <Button 
-                          onClick={handleCheckout}
-                          className="w-full bg-[#0095ff] text-white hover:bg-[#007acc]"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? "Processing..." : "Proceed to Checkout"}
-                        </Button>
+                    </div>
+
+                    {/* Terms and Checkout */}
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 p-4 rounded-lg text-sm text-gray-600">
+                        <p>By clicking "Complete Order" you agree to our <a href="/terms" className="text-[#0095ff] hover:underline">Terms of Service</a> and acknowledge that:</p>
+                        <ul className="mt-2 space-y-1 list-disc list-inside">
+                          <li>50% of the total amount will be charged today</li>
+                          <li>The remaining 50% will be charged on the day of delivery</li>
+                          <li>Cancellations must be made at least 48 hours before the event</li>
+                        </ul>
                       </div>
-                    </section>
+                      
+                      <Button 
+                        onClick={handleFakeOrder}
+                        className="w-full bg-[#0095ff] text-white hover:bg-[#007acc] h-12 text-lg"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            Processing...
+                          </div>
+                        ) : (
+                          'Complete Order'
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
