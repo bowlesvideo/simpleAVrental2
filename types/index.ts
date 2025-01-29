@@ -28,4 +28,17 @@ export interface OrderDetails {
   status: string;
   items: OrderItem[];
   eventDetails: EventDetails;
-} 
+}
+
+export type Package = {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  keyFeatures: never[];
+  image: string;
+  slug: string;
+  includedItems: never[];
+  additionalImages: never[];
+  useCaseLabels: string[];
+}; 

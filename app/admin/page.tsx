@@ -1104,9 +1104,10 @@ const AdminPage = () => {
                           price: 0,
                           keyFeatures: [],
                           image: '',
-                          slug: `package-${packages.length + 1}`,
+                          slug: '',
                           includedItems: [],
-                          additionalImages: []
+                          additionalImages: [],
+                          useCaseLabels: []
                         }
                       ]);
                     }}
