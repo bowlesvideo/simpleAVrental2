@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Check } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -18,6 +19,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { formatCurrency } from '@/lib/utils'
+import { useCart } from '@/context/cart-context'
+import type { Package, AddOn } from '@/lib/types'
 
 interface InventoryItem {
   id: string
@@ -49,12 +52,16 @@ const renderTags = (item: InventoryItem) => {
 };
 
 export default function InventoryPage() {
+  const { addPackage, addAddOn, items: cartItems, removeItem } = useCart()
   const [items, setItems] = useState<InventoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('name-asc')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [packages, setPackages] = useState<Package[]>([])
+  const [addOns, setAddOns] = useState<AddOn[]>([])
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   // Fetch inventory data
   useEffect(() => {
@@ -90,6 +97,21 @@ export default function InventoryPage() {
     fetchInventory()
   }, [])
 
+  useEffect(() => {
+    const fetchRentalConfig = async () => {
+      try {
+        const response = await fetch('/api/rental-config')
+        if (!response.ok) throw new Error('Failed to fetch rental config')
+        const data = await response.json()
+        setPackages(data.packages || [])
+        setAddOns(data.addOns || [])
+      } catch (error) {
+        console.error('Error fetching rental config:', error)
+      }
+    }
+    fetchRentalConfig()
+  }, [])
+
   // Get unique categories from items
   const categories = ['all', ...Array.from(new Set(items.map(item => item.category)))]
 
@@ -120,6 +142,28 @@ export default function InventoryPage() {
           return 0
       }
     })
+
+  const isItemInCart = (itemId: string) => {
+    return cartItems.some(cartItem => cartItem.id === itemId)
+  }
+
+  const handleCartAction = (item: InventoryItem) => {
+    if (isItemInCart(item.id)) {
+      removeItem(item.id)
+    } else {
+      if (item.category === 'Add-on') {
+        const fullAddOn = addOns.find(a => a.id === item.id)
+        if (fullAddOn) {
+          addAddOn(fullAddOn)
+        }
+      } else {
+        const fullPackage = packages.find(p => p.id === item.id)
+        if (fullPackage) {
+          addPackage(fullPackage)
+        }
+      }
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
@@ -218,8 +262,8 @@ export default function InventoryPage() {
             {viewMode === 'grid' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredItems.map((item) => (
-                  <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="aspect-video relative bg-gray-100">
+                  <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+                    <div className="h-[200px] relative bg-gray-100">
                       {item.image ? (
                         <img
                           src={item.image}
@@ -239,27 +283,50 @@ export default function InventoryPage() {
                         </div>
                       )}
                     </div>
-                    <CardHeader>
-                      <CardTitle className="text-lg">{item.name}</CardTitle>
-                      <p className="text-sm text-gray-500">{item.category}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {renderTags(item)}
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-[#072948]">
-                        {formatCurrency(item.price)}
-                      </span>
-                      <Button
-                        variant="outline"
-                        className="text-[#0095ff] border-[#0095ff] hover:bg-[#0095ff] hover:text-white"
-                      >
-                        View Details
-                      </Button>
-                    </CardFooter>
+                    <div className="flex-1">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{item.name}</CardTitle>
+                        <p className="text-sm text-gray-500">{item.category}</p>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {renderTags(item)}
+                        </div>
+                      </CardContent>
+                    </div>
+                    <div className="mt-auto border-t">
+                      <CardFooter className="flex justify-between items-center pt-4">
+                        <span className="text-lg font-bold text-[#072948]">
+                          {formatCurrency(item.price)}
+                        </span>
+                        <Button
+                          onClick={() => handleCartAction(item)}
+                          className={`w-full max-w-[140px] transition-all ${
+                            isItemInCart(item.id)
+                              ? "bg-green-500 hover:bg-red-500 text-white"
+                              : "bg-[#0095ff] hover:bg-[#007acc] text-white"
+                          }`}
+                          onMouseEnter={() => setHoveredItem(item.id)}
+                          onMouseLeave={() => setHoveredItem(null)}
+                        >
+                          {isItemInCart(item.id) ? (
+                            <span className="flex items-center gap-2">
+                              {hoveredItem === item.id ? (
+                                "Remove"
+                              ) : (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  Added
+                                </>
+                              )}
+                            </span>
+                          ) : (
+                            "Add to Cart"
+                          )}
+                        </Button>
+                      </CardFooter>
+                    </div>
                   </Card>
                 ))}
               </div>
@@ -271,7 +338,7 @@ export default function InventoryPage() {
                 {filteredItems.map((item) => (
                   <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
                     <div className="flex">
-                      <div className="w-48 bg-gray-100">
+                      <div className="w-[200px] h-[200px] flex-shrink-0 bg-gray-100">
                         {item.image ? (
                           <img
                             src={item.image}
@@ -286,34 +353,52 @@ export default function InventoryPage() {
                           </div>
                         )}
                       </div>
-                      <div className="flex-1 p-6">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-xl font-semibold text-[#072948]">{item.name}</h3>
-                            <p className="text-sm text-gray-500">{item.category}</p>
+                      <div className="flex-1 p-6 flex flex-col">
+                        <div>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="text-xl font-semibold text-[#072948] hover:text-[#0095ff] cursor-pointer transition-colors">
+                                {item.name}
+                              </h3>
+                              <p className="text-sm text-gray-500">{item.category}</p>
+                            </div>
                           </div>
-                          <div className="text-right">
+                          <p className="mt-2 text-gray-600">{item.description}</p>
+                          <div className="mt-4 flex flex-wrap gap-1">
+                            {renderTags(item)}
+                          </div>
+                        </div>
+                        <div className="mt-auto pt-4 border-t">
+                          <div className="flex justify-between items-center">
                             <div className="text-xl font-bold text-[#072948]">
                               {formatCurrency(item.price)}
                             </div>
-                            {!item.inStock && (
-                              <span className="inline-block bg-red-500 text-white text-xs px-2 py-1 rounded">
-                                Out of Stock
-                              </span>
-                            )}
+                            <Button
+                              onClick={() => handleCartAction(item)}
+                              className={`min-w-[120px] transition-all ${
+                                isItemInCart(item.id)
+                                  ? "bg-green-500 hover:bg-red-500 text-white"
+                                  : "bg-[#0095ff] hover:bg-[#007acc] text-white"
+                              }`}
+                              onMouseEnter={() => setHoveredItem(item.id)}
+                              onMouseLeave={() => setHoveredItem(null)}
+                            >
+                              {isItemInCart(item.id) ? (
+                                <span className="flex items-center gap-2">
+                                  {hoveredItem === item.id ? (
+                                    "Remove"
+                                  ) : (
+                                    <>
+                                      <Check className="w-4 h-4" />
+                                      Added
+                                    </>
+                                  )}
+                                </span>
+                              ) : (
+                                "Add to Cart"
+                              )}
+                            </Button>
                           </div>
-                        </div>
-                        <p className="mt-2 text-gray-600">{item.description}</p>
-                        <div className="mt-4 flex items-center justify-between">
-                          <div className="flex flex-wrap gap-1">
-                            {renderTags(item)}
-                          </div>
-                          <Button
-                            variant="outline"
-                            className="text-[#0095ff] border-[#0095ff] hover:bg-[#0095ff] hover:text-white"
-                          >
-                            View Details
-                          </Button>
                         </div>
                       </div>
                     </div>
