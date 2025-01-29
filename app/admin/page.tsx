@@ -709,6 +709,16 @@ const AdminPage = () => {
     setPackages(updatedPackages);
   };
 
+  const handleReplaceAddonImage = (index: number, file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const updatedAddons = [...addons];
+      updatedAddons[index].image = reader.result as string;
+      setAddons(updatedAddons);
+    };
+    reader.readAsDataURL(file);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -1167,6 +1177,65 @@ const AdminPage = () => {
                                     onChange={(e) => handleAddonChange(index, 'description', e.target.value)}
                                     rows={3}
                                   />
+                                </div>
+
+                                {/* Add-on Image Section */}
+                                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                  <Label className="text-sm font-medium text-gray-900 mb-4 block">Add-on Image</Label>
+                                  <div className="space-y-4">
+                                    <div className="w-48">
+                                      <div className="relative aspect-[4/3] rounded-lg border-2 border-dashed border-gray-300 overflow-hidden bg-white mb-2">
+                                        {addon.image ? (
+                                          <img
+                                            src={addon.image}
+                                            alt={`${addon.name} preview`}
+                                            className="w-full h-full object-cover"
+                                          />
+                                        ) : (
+                                          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+                                            <Camera className="w-6 h-6 mb-1" />
+                                            <span className="text-xs">No image</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="space-y-2">
+                                        <div>
+                                          <Label className="text-xs text-gray-600 mb-1 block">Upload Image</Label>
+                                          <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                              const file = e.target.files?.[0];
+                                              if (file) {
+                                                handleReplaceAddonImage(index, file);
+                                              }
+                                            }}
+                                            className="w-full text-xs"
+                                          />
+                                        </div>
+                                        <div>
+                                          <Label className="text-xs text-gray-600 mb-1 block">Or Image URL</Label>
+                                          <Input
+                                            type="url"
+                                            placeholder="https://example.com/image.jpg"
+                                            value={addon.image || ''}
+                                            onChange={(e) => handleAddonChange(index, 'image', e.target.value)}
+                                            className="w-full text-xs"
+                                          />
+                                        </div>
+                                        {addon.image && (
+                                          <Button
+                                            onClick={() => handleAddonChange(index, 'image', '')}
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full text-red-600 hover:text-red-700 text-xs"
+                                          >
+                                            Remove Image
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
 
                                 <div>
