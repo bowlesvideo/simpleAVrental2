@@ -21,6 +21,10 @@ export function PackageComparison({
   onPackageSelect,
   onChoosePackage 
 }: PackageComparisonProps) {
+  // Temporary debugging logs
+  console.log('Packages received:', packages)
+  console.log('Package IDs:', packages.map(p => p.id))
+
   const router = useRouter()
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
@@ -114,6 +118,19 @@ export function PackageComparison({
               )}
               
               <h3 className="text-lg font-semibold text-[#072948] mb-2">{pkg.name}</h3>
+              
+              {/* Use Case Labels */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {getUseCaseLabels(pkg.id).map((label, idx) => (
+                  <span 
+                    key={idx} 
+                    className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-[#e8f0f9] text-[#0095ff] border border-[#0095ff]/10"
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+
               <p className="text-gray-600 text-sm mb-4 min-h-[40px]">{pkg.description}</p>
               
               <div className="space-y-2 mb-6">
@@ -348,4 +365,38 @@ export function PackageComparison({
       )}
     </div>
   )
+}
+
+function getUseCaseLabels(packageId: string): string[] {
+  // Normalize the ID to handle any case variations
+  const normalizedId = packageId.toLowerCase().trim()
+  
+  const labelMap: { [key: string]: string[] } = {
+    'meeting': [
+      'Board Meetings',
+      'Team Updates',
+      'Client Presentations',
+      'Small Groups'
+    ],
+    'webinar': [
+      'Virtual Events',
+      'Webinars',
+      'Online Summits',
+      'Live Streams'
+    ],
+    'training': [
+      'Workshops',
+      'Training Sessions',
+      'Educational Events',
+      'Skill Development'
+    ],
+    'package-4': [  // Updated from 'townhall' to 'package-4'
+      'Ballrooms',
+      'Theaters',
+      'Convention Halls',
+      'Auditoriums'
+    ]
+  }
+
+  return labelMap[normalizedId] || []
 } 
