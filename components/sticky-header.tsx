@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useCart } from '@/context/cart-context'
 import { scrollToElement } from '@/lib/scroll-utils'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 export function StickyHeader() {
   const [isVisible, setIsVisible] = useState(false)
@@ -28,7 +29,15 @@ export function StickyHeader() {
         <div className="h-16 flex items-center justify-between">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <span className="text-white font-semibold text-lg">VideoPRO</span>
+            <div className="bg-white rounded-lg p-2">
+              <Image
+                width={120}
+                height={32}
+                alt="VideoPro Logo"
+                src="/images/videopro_logo_blue.png"
+                className="h-8 w-auto"
+              />
+            </div>
           </div>
 
           {/* CTAs */}
