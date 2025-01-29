@@ -42,6 +42,34 @@ export function StickyHeader() {
 
           {/* CTAs */}
           <div className="flex items-center gap-4">
+            {/* Navigation Links */}
+            <nav className="hidden md:flex items-center gap-4">
+              <a 
+                href="/inventory"
+                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+              >
+                Browse Gear
+              </a>
+              <a 
+                href="/about"
+                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+              >
+                About
+              </a>
+              <a 
+                href="/blog"
+                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+              >
+                Blog
+              </a>
+              <a 
+                href="/contact"
+                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+              >
+                Contact
+              </a>
+            </nav>
+
             {/* Cart Status */}
             {cartCount > 0 && (
               <a 

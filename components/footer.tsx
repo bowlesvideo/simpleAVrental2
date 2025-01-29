@@ -16,6 +16,11 @@ export function Footer() {
             <nav>
               <ul className="space-y-2">
                 <li>
+                  <a href="/inventory" className="text-gray-300 hover:text-white transition-colors">
+                    Browse Gear
+                  </a>
+                </li>
+                <li>
                   <a href="/about" className="text-gray-300 hover:text-white transition-colors">
                     About Us
                   </a>

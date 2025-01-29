@@ -41,6 +41,12 @@ export function Header() {
           <div className="flex items-center space-x-6">
             <div className="hidden md:flex space-x-6">
               <Link 
+                href="/inventory" 
+                className="text-sm font-medium transition-colors hover:text-[#0095ff]"
+              >
+                Browse Gear
+              </Link>
+              <Link 
                 href="/about" 
                 className="text-sm font-medium transition-colors hover:text-[#0095ff]"
               >
