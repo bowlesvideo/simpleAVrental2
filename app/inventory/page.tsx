@@ -298,7 +298,7 @@ export default function InventoryPage() {
                     <div className="mt-auto border-t">
                       <CardFooter className="flex justify-between items-center pt-4">
                         <span className="text-lg font-bold text-[#072948]">
-                          {formatCurrency(item.price)}
+                          {formatCurrency(item.price).replace('.00', '')}
                         </span>
                         <Button
                           onClick={() => handleCartAction(item)}
@@ -371,7 +371,7 @@ export default function InventoryPage() {
                         <div className="mt-auto pt-4 border-t">
                           <div className="flex justify-between items-center">
                             <div className="text-xl font-bold text-[#072948]">
-                              {formatCurrency(item.price)}
+                              {formatCurrency(item.price).replace('.00', '')}
                             </div>
                             <Button
                               onClick={() => handleCartAction(item)}
