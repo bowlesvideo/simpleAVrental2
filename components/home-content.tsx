@@ -6,7 +6,6 @@ import { PackageChooser } from '@/components/package-chooser'
 import { useCart } from '@/context/cart-context'
 import { StructuredData } from '@/components/structured-data'
 import { SITE_NAME } from '@/lib/constants'
-import { PlaceholderLogos } from '@/components/placeholder-logos'
 import { StickyHeader } from '@/components/sticky-header'
 import { scrollToElement } from '@/lib/scroll-utils'
 import { useRouter } from 'next/navigation'
@@ -215,9 +214,9 @@ export function HomeContent() {
         additionalSchema={structuredData}
       />
       <main className="min-h-screen bg-[#072948]" role="main">
-        <header className="relative pt-16 pb-32 bg-[#072948] overflow-hidden">
+        <header className="relative pt-12 pb-24 bg-white overflow-hidden">
           {/* Background Video */}
-          <div className="absolute inset-0 z-0 opacity-20">
+          <div className="absolute inset-0 z-0 opacity-10">
             <video
               autoPlay
               loop
@@ -230,18 +229,18 @@ export function HomeContent() {
           </div>
 
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="max-w-4xl mx-auto text-center mb-12">
-              <h1 className="text-4xl sm:text-6xl font-bold mb-6 text-white tracking-tight leading-tight">
+            <div className="max-w-4xl mx-auto text-center mb-8">
+              <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#072948] tracking-tight leading-tight">
                 Professional Video Production <br />
                 <span className="text-[#0095ff]">At Your Office</span>
               </h1>              
-              <p className="text-xl sm:text-2xl text-gray-200 leading-relaxed mb-8">
+              <p className="text-xl sm:text-2xl text-gray-600 leading-relaxed mb-6">
                 From setup to delivery, we make corporate video production simple. 
                 Our Orlando-based team handles everything - just book online and we'll take care of the rest.
               </p>
               
               {/* Enhanced CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <button 
                   onClick={() => handleScroll('packages')}
                   className="group relative bg-[#0095ff] hover:bg-[#007acc] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
@@ -255,7 +254,7 @@ export function HomeContent() {
                 </button>
                 <button 
                   onClick={() => handleScroll('process')}
-                  className="group bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300"
+                  className="group bg-[#072948] hover:bg-[#0a3761] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300"
                 >
                   <span className="flex items-center justify-center gap-2">
                     See How It Works
@@ -268,7 +267,7 @@ export function HomeContent() {
 
               {/* Quick Contact CTA */}
               <div 
-                className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-[#072948] transition-colors cursor-pointer mb-12"
                 onClick={() => router.push('/contact')}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -279,65 +278,59 @@ export function HomeContent() {
             </div>
 
             {/* Key Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {[
                 { number: "20+", label: "Years Experience" },
                 { number: "1000+", label: "Events Filmed" },
                 { number: "98%", label: "Client Satisfaction" },
                 { number: "24hr", label: "Delivery Time" }
               ].map((stat, index) => (
-                <div key={index} className="text-center p-4 rounded-lg bg-white/5 backdrop-blur-sm">
-                  <div className="text-3xl font-bold text-[#0095ff] mb-1">{stat.number}</div>
-                  <div className="text-sm text-gray-300">{stat.label}</div>
+                <div key={index} className="text-center p-6 rounded-lg bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="text-2xl sm:text-3xl font-bold text-[#072948] mb-2">{stat.number}</div>
+                  <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
                 </div>
               ))}
-            </div>
-
-            {/* Client Logos */}
-            <div className="max-w-5xl mx-auto">
-              <p className="text-center text-sm text-gray-400 mb-6">Trusted by Leading Companies</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-                {[
-                  { Logo: PlaceholderLogos.Logo1, name: "TECH" },
-                  { Logo: PlaceholderLogos.Logo2, name: "GLOBAL" },
-                  { Logo: PlaceholderLogos.Logo3, name: "PEAK" },
-                  { Logo: PlaceholderLogos.Logo4, name: "SQUARE" }
-                ].map(({ Logo, name }, index) => (
-                  <div key={index} className="flex items-center justify-center">
-                    <Logo 
-                      name={name}
-                      className="h-12 text-white opacity-70 hover:opacity-100 transition-opacity duration-300"
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </header>
 
-        <section id="packages" className="py-8 bg-[#072948]" aria-labelledby="packages-heading">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto text-center mb-8">
-              <h2 id="packages-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4">
+        <section 
+          id="packages" 
+          className="relative py-24 bg-[#072948]" 
+          aria-labelledby="packages-heading"
+        >
+          {/* Add subtle pattern overlay */}
+          <div 
+            className="absolute inset-0 opacity-5 pointer-events-none" 
+            style={{ 
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+            }}
+          />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="max-w-4xl mx-auto text-center mb-12">
+              <span className="inline-block text-[#0095ff] font-semibold text-sm uppercase tracking-wider mb-4">Our Packages</span>
+              <h2 id="packages-heading" className="text-3xl sm:text-5xl font-bold text-white mb-6">
                 Choose Your Package
               </h2>
-              <p className="text-lg text-gray-300">
-                Select the package that best fits your event needs.
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                Select the package that best fits your event needs. Each package includes professional operators and comprehensive support.
               </p>
             </div>
 
-            <PackageComparison
-              packages={packages}
-              addOns={addOns}
-              selectedPackageId={selectedPackageId}
-              onPackageSelect={handlePackageSelect}
-              onChoosePackage={handleChoosePackage}
-            />
+            <div className="mt-16">
+              <PackageComparison
+                packages={packages}
+                addOns={addOns}
+                selectedPackageId={selectedPackageId}
+                onPackageSelect={handlePackageSelect}
+                onChoosePackage={handleChoosePackage}
+              />
+            </div>
           </div>
         </section>
 
         <section 
-          className="py-16 bg-white" 
+          className="py-16 bg-white border-t border-gray-100" 
           aria-labelledby="experience-heading"
           itemScope 
           itemType="https://schema.org/Organization"
@@ -365,13 +358,13 @@ export function HomeContent() {
               aria-label="Our expertise areas"
             >
               <div 
-                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
+                className="bg-white rounded-xl p-8 text-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
                 itemType="https://schema.org/DefinedTerm"
               >
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[#f5f9ff] rounded-full" aria-hidden="true">
                   <svg className="w-10 h-10 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
@@ -383,13 +376,13 @@ export function HomeContent() {
               </div>
 
               <div 
-                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
+                className="bg-white rounded-xl p-8 text-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
                 itemType="https://schema.org/DefinedTerm"
               >
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[#f5f9ff] rounded-full" aria-hidden="true">
                   <svg className="w-10 h-10 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
@@ -401,13 +394,13 @@ export function HomeContent() {
               </div>
 
               <div 
-                className="bg-gray-50 rounded-xl p-6 text-center shadow-sm"
+                className="bg-white rounded-xl p-8 text-center shadow-md hover:shadow-lg transition-shadow border border-gray-100"
                 role="listitem"
                 itemScope
                 itemProp="knowsAbout"
                 itemType="https://schema.org/DefinedTerm"
               >
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center" aria-hidden="true">
+                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[#f5f9ff] rounded-full" aria-hidden="true">
                   <svg className="w-10 h-10 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
                   </svg>
