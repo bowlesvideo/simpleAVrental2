@@ -11,7 +11,7 @@ import { DayPicker } from 'react-day-picker'
 import { format, addDays, isWeekend } from 'date-fns'
 import 'react-day-picker/dist/style.css'
 import { featureIcons } from '@/lib/constants'
-import type { PackageFeature } from '@/lib/types'
+import type { PackageFeature, AddOn } from '@/lib/types'
 import {
   Select,
   SelectContent,
@@ -22,6 +22,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
+import { PackageComparison } from '@/components/package-comparison'
+import { formatCurrency } from '@/lib/utils'
 
 interface CartItem {
   id: string
@@ -134,7 +136,7 @@ function getTenBusinessDaysAhead(): Date {
 }
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, total, clearCart } = useCart()
+  const { items, removeItem, updateQuantity, total, clearCart, addPackage, addAddOn } = useCart()
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const [eventDate, setEventDate] = useState<Date | null>(null)
@@ -163,6 +165,10 @@ export default function CartPage() {
     state?: boolean;
     zip?: boolean;
   }>({})
+  const [showAddOns, setShowAddOns] = useState(false)
+  const [selectedPackageForAddOns, setSelectedPackageForAddOns] = useState<CartItem | null>(null)
+  const [selectedAddOns, setSelectedAddOns] = useState<{ [packageId: string]: string[] }>({})
+  const [addOns, setAddOns] = useState<AddOn[]>([])
 
   // Load event details from localStorage on mount
   useEffect(() => {
@@ -553,6 +559,85 @@ export default function CartPage() {
     }
   }
 
+  const handleViewAddOns = (pkg: CartItem) => {
+    // Find all add-ons that are already in the cart for this package
+    const currentAddOns = items
+      .filter(item => 
+        item.type === 'addon' && // Is an add-on
+        addOns.some(addon => 
+          addon.id === item.id && // Match the add-on
+          addon.packages?.includes(pkg.id) // Compatible with this package
+        )
+      )
+      .map(item => item.id);
+    
+    setSelectedAddOns({
+      [pkg.id]: currentAddOns
+    });
+    setSelectedPackageForAddOns(pkg);
+    setShowAddOns(true);
+  }
+
+  const handleCloseModal = () => {
+    setShowAddOns(false);
+    setSelectedPackageForAddOns(null);
+    setSelectedAddOns({});
+  }
+
+  // Fetch add-ons data
+  useEffect(() => {
+    const fetchAddOns = async () => {
+      try {
+        const response = await fetch('/api/rental-config')
+        if (!response.ok) throw new Error('Failed to fetch add-ons')
+        const data = await response.json()
+        setAddOns(data.addOns || [])
+      } catch (error) {
+        console.error('Error fetching add-ons:', error)
+      }
+    }
+    fetchAddOns()
+  }, [])
+
+  const handleAddOnToggle = (packageId: string, addOnId: string) => {
+    setSelectedAddOns(prev => {
+      const packageAddOns = prev[packageId] || []
+      const isSelected = packageAddOns.includes(addOnId)
+      
+      if (isSelected) {
+        removeItem(addOnId)
+        return {
+          ...prev,
+          [packageId]: packageAddOns.filter(id => id !== addOnId)
+        }
+      } else {
+        const addon = addOns.find(a => a.id === addOnId)
+        if (addon) {
+          // First remove any existing instance of this add-on
+          removeItem(addOnId)
+          
+          // Then add it fresh with quantity 1
+          const addOnItem = {
+            ...addon,
+            quantity: 1,
+            type: 'addon' as const
+          }
+          addAddOn(addOnItem)
+          
+          return {
+            ...prev,
+            [packageId]: [...packageAddOns, addOnId]
+          }
+        }
+        return prev
+      }
+    })
+  }
+
+  const filteredAddOns = selectedPackageForAddOns
+    ? addOns.filter(addon => addon.packages?.includes(selectedPackageForAddOns.id))
+    : []
+
   if (items.length === 0) {
     return (
       <main className="min-h-screen bg-white py-16" role="main">
@@ -723,7 +808,9 @@ export default function CartPage() {
                         <h3 className="font-medium text-sm text-gray-500">Packages</h3>
                         {packages.map((item) => (
                           <div key={item.id} className="flex justify-between items-center group">
-                            <span>{item.name}</span>
+                            <div className="flex-1">
+                              <span>{item.name}</span>
+                            </div>
                             <div className="flex items-center gap-2">
                               <div className="flex items-center border rounded-md">
                                 <button
@@ -793,6 +880,25 @@ export default function CartPage() {
                           </div>
                         ))}
                       </section>
+                    )}
+                    {packages.length > 0 && (
+                      <div className="pt-4 border-t">
+                        <div className="grid gap-2">
+                          {packages.map((pkg) => (
+                            <Button
+                              key={pkg.id}
+                              onClick={() => handleViewAddOns(pkg)}
+                              variant="outline"
+                              className="w-full text-left flex justify-between items-center"
+                            >
+                              <span>Add Add-ons for {pkg.name}</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                              </svg>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
                     )}
                     <section aria-label="Order total" className="pt-4 border-t">
                       <div className="flex justify-between text-lg font-semibold">
@@ -1210,6 +1316,76 @@ export default function CartPage() {
             )}
           </section>
         </div>
+
+        {/* Add-ons Modal */}
+        {showAddOns && selectedPackageForAddOns && (
+          <div 
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                handleCloseModal();
+              }
+            }}
+          >
+            <div className="min-h-screen px-4 text-center">
+              <span
+                className="inline-block h-screen align-middle"
+                aria-hidden="true"
+              >
+                &#8203;
+              </span>
+              
+              <div className="inline-block w-full max-w-5xl p-6 my-8 text-left align-middle bg-gray-50 rounded-lg border border-gray-200 shadow-xl transition-all">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-[#072948]">
+                    Add-ons for {selectedPackageForAddOns.name}
+                  </h3>
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                {filteredAddOns.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredAddOns.map((addon) => (
+                      <div 
+                        key={addon.id}
+                        className="bg-white rounded-lg border border-gray-200 p-4 hover:border-[#0095ff] transition-colors cursor-pointer"
+                      >
+                        <label className="flex items-start gap-3 w-full">
+                          <input
+                            type="checkbox"
+                            checked={selectedAddOns[selectedPackageForAddOns.id]?.includes(addon.id) || false}
+                            onChange={() => handleAddOnToggle(selectedPackageForAddOns.id, addon.id)}
+                            className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0095ff] focus:ring-[#0095ff] cursor-pointer"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 className="font-semibold text-[#072948]">{addon.name}</h4>
+                              <div className="text-lg font-bold text-[#072948]">
+                                {formatCurrency(addon.price).replace('.00', '')}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-600">{addon.description}</p>
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    No add-ons available for this package
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   )

@@ -10,6 +10,7 @@ import { PlaceholderLogos } from '@/components/placeholder-logos'
 import { StickyHeader } from '@/components/sticky-header'
 import { scrollToElement } from '@/lib/scroll-utils'
 import { useRouter } from 'next/navigation'
+import { PackageComparison } from '@/components/package-comparison'
 
 export function HomeContent() {
   const router = useRouter()
@@ -41,21 +42,23 @@ export function HomeContent() {
     })
   }, [addOns])
 
-  const handleChoosePackage = useCallback((packageId: string) => {
+  const handleChoosePackage = useCallback((packageId: string, selectedAddOnIds?: string[]) => {
     const selectedPackage = packages.find(p => p.id === packageId)
     if (selectedPackage) {
       // Add the package first
       addPackage(selectedPackage)
       
       // Then add all selected add-ons
-      selectedAddOnIds.forEach(addOnId => {
-        const addon = addOns.find(a => a.id === addOnId)
-        if (addon) {
-          addAddOn(addon)
-        }
-      })
+      if (selectedAddOnIds?.length) {
+        selectedAddOnIds.forEach(addOnId => {
+          const addon = addOns.find(a => a.id === addOnId)
+          if (addon) {
+            addAddOn(addon)
+          }
+        })
+      }
     }
-  }, [packages, addOns, selectedAddOnIds, addPackage, addAddOn])
+  }, [packages, addOns, addPackage, addAddOn])
 
   const handleScroll = useCallback((elementId: string) => {
     scrollToElement(elementId)
@@ -314,16 +317,21 @@ export function HomeContent() {
 
         <section id="packages" className="py-8 bg-[#072948]" aria-labelledby="packages-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 id="packages-heading" className="sr-only">Available Packages</h2>
-            <PackageChooser
+            <div className="max-w-4xl mx-auto text-center mb-8">
+              <h2 id="packages-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Choose Your Package
+              </h2>
+              <p className="text-lg text-gray-300">
+                Select the package that best fits your event needs.
+              </p>
+            </div>
+
+            <PackageComparison
               packages={packages}
               addOns={addOns}
-              addonGroups={addonGroups}
+              selectedPackageId={selectedPackageId}
               onPackageSelect={handlePackageSelect}
               onChoosePackage={handleChoosePackage}
-              onAddOnToggle={handleAddOnToggle}
-              selectedPackageId={selectedPackageId}
-              selectedAddOnIds={selectedAddOnIds}
             />
           </div>
         </section>
