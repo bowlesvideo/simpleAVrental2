@@ -308,7 +308,10 @@ export default function CartPage() {
     }
   }
 
-  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1) as 1 | 2 | 3)
+  const prevStep = () => {
+    setStep(prev => Math.max(prev - 1, 1) as 1 | 2 | 3)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   
   const isContactDetailsValid = companyName && contactName && contactEmail
 
@@ -484,12 +487,13 @@ export default function CartPage() {
       }
     }
     setStep(prev => Math.min(prev + 1, 3) as 1 | 2 | 3)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleStepClick = (targetStep: number) => {
     // If going backwards, always allow
     if (targetStep < step) {
-      setStep(targetStep as 1 | 2 | 3)
+      prevStep()
       return
     }
 
@@ -501,6 +505,7 @@ export default function CartPage() {
         return
       }
       setStep(3)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
@@ -512,6 +517,7 @@ export default function CartPage() {
         return
       }
       setStep(2)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
   }
@@ -1579,7 +1585,7 @@ export default function CartPage() {
           <div className="flex justify-between max-w-7xl mx-auto">
             <Button
               variant="outline"
-              onClick={prevStep}
+              onClick={() => prevStep()}
               disabled={step === 1}
               className="w-[120px]"
             >
@@ -1599,7 +1605,7 @@ export default function CartPage() {
           <section className="flex justify-between mt-8" aria-label="Navigation controls">
             <Button
               variant="outline"
-              onClick={prevStep}
+              onClick={() => prevStep()}
               disabled={step === 1}
               className="w-[120px]"
             >
