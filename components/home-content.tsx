@@ -6,8 +6,13 @@ import { PackageChooser } from '@/components/package-chooser'
 import { useCart } from '@/context/cart-context'
 import { StructuredData } from '@/components/structured-data'
 import { SITE_NAME } from '@/lib/constants'
+import { PlaceholderLogos } from '@/components/placeholder-logos'
+import { StickyHeader } from '@/components/sticky-header'
+import { scrollToElement } from '@/lib/scroll-utils'
+import { useRouter } from 'next/navigation'
 
 export function HomeContent() {
+  const router = useRouter()
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null)
   const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([])
   const [packages, setPackages] = useState<Package[]>([])
@@ -51,6 +56,10 @@ export function HomeContent() {
       })
     }
   }, [packages, addOns, selectedAddOnIds, addPackage, addAddOn])
+
+  const handleScroll = useCallback((elementId: string) => {
+    scrollToElement(elementId)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -180,6 +189,7 @@ export function HomeContent() {
 
   return (
     <>
+      <StickyHeader />
       <StructuredData 
         packages={packages}
         testimonials={[
@@ -201,21 +211,108 @@ export function HomeContent() {
         ]}
         additionalSchema={structuredData}
       />
-      <main className="min-h-screen bg-[#072948] py-6" role="main">
-        <header className="pt-16 pb-8 bg-[#072948]">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto text-center mb-4">
-              <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white tracking-tight">
-                Orlando Corporate Video Production
+      <main className="min-h-screen bg-[#072948]" role="main">
+        <header className="relative pt-16 pb-32 bg-[#072948] overflow-hidden">
+          {/* Background Video */}
+          <div className="absolute inset-0 z-0 opacity-20">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/videos/hero-background.mp4" type="video/mp4" />
+            </video>
+          </div>
+
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-4xl mx-auto text-center mb-12">
+              <h1 className="text-4xl sm:text-6xl font-bold mb-6 text-white tracking-tight leading-tight">
+                Professional Video Production <br />
+                <span className="text-[#0095ff]">At Your Office</span>
               </h1>              
-              <p className="text-lg sm:text-xl text-gray-200 leading-relaxed">
-                From booking to delivery, we make corporate video production simple. Our Orlando-based team handles everything - setup, recording, streaming, and next-day delivery of your content. Just book online and we'll take care of the rest.
+              <p className="text-xl sm:text-2xl text-gray-200 leading-relaxed mb-8">
+                From setup to delivery, we make corporate video production simple. 
+                Our Orlando-based team handles everything - just book online and we'll take care of the rest.
               </p>
+              
+              {/* Enhanced CTAs */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button 
+                  onClick={() => handleScroll('packages')}
+                  className="group relative bg-[#0095ff] hover:bg-[#007acc] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    View Packages & Pricing
+                    <svg className="w-5 h-5 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </span>
+                </button>
+                <button 
+                  onClick={() => handleScroll('process')}
+                  className="group bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    See How It Works
+                    <svg className="w-5 h-5 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+
+              {/* Quick Contact CTA */}
+              <div 
+                className="inline-flex items-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                onClick={() => router.push('/contact')}
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span>Need to talk? Contact our team</span>
+              </div>
+            </div>
+
+            {/* Key Statistics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-16">
+              {[
+                { number: "20+", label: "Years Experience" },
+                { number: "1000+", label: "Events Filmed" },
+                { number: "98%", label: "Client Satisfaction" },
+                { number: "24hr", label: "Delivery Time" }
+              ].map((stat, index) => (
+                <div key={index} className="text-center p-4 rounded-lg bg-white/5 backdrop-blur-sm">
+                  <div className="text-3xl font-bold text-[#0095ff] mb-1">{stat.number}</div>
+                  <div className="text-sm text-gray-300">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Client Logos */}
+            <div className="max-w-5xl mx-auto">
+              <p className="text-center text-sm text-gray-400 mb-6">Trusted by Leading Companies</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+                {[
+                  { Logo: PlaceholderLogos.Logo1, name: "TECH" },
+                  { Logo: PlaceholderLogos.Logo2, name: "GLOBAL" },
+                  { Logo: PlaceholderLogos.Logo3, name: "PEAK" },
+                  { Logo: PlaceholderLogos.Logo4, name: "SQUARE" }
+                ].map(({ Logo, name }, index) => (
+                  <div key={index} className="flex items-center justify-center">
+                    <Logo 
+                      name={name}
+                      className="h-12 text-white opacity-70 hover:opacity-100 transition-opacity duration-300"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </header>
 
-        <section className="py-8 bg-[#072948]" aria-labelledby="packages-heading">
+        <section id="packages" className="py-8 bg-[#072948]" aria-labelledby="packages-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 id="packages-heading" className="sr-only">Available Packages</h2>
             <PackageChooser
@@ -316,36 +413,114 @@ export function HomeContent() {
           </div>
         </section>
 
-        <section className="py-24 bg-white border-t border-gray-100" aria-labelledby="process-heading">
+        {/* Process Section - How It Works */}
+        <section 
+          id="process" 
+          className="py-24 bg-white border-t border-gray-100" 
+          aria-labelledby="process-heading"
+        >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-center text-[#072948] mb-20">
-              Guided Event Experience
-            </h2>
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <span className="text-[#0095ff] font-semibold text-sm uppercase tracking-wider">Simple Process</span>
+              <h2 id="process-heading" className="text-3xl sm:text-4xl font-bold text-[#072948] mt-4 mb-6">
+                How VideoPRO Works
+              </h2>
+              <p className="text-xl text-gray-600">
+                From booking to delivery, we've streamlined every step to make professional video production effortless.
+              </p>
+            </div>
             
-            <div className="relative max-w-5xl mx-auto px-4">
-              <div className="absolute top-[60px] left-8 right-8 h-0.5 bg-[#0095ff] -translate-y-1/2" aria-hidden="true"></div>
+            <div className="relative max-w-6xl mx-auto">
+              {/* Timeline connector */}
+              <div className="absolute top-[60px] left-8 right-8 h-0.5 bg-[#0095ff] hidden lg:block" aria-hidden="true"></div>
               
-              <ol className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-12 sm:gap-6 relative">
+              <ol className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12 lg:gap-8 relative">
                 {[
-                  { step: 1, title: 'Reserve', desc: 'Choose your package and select any add-ons you need' },
-                  { step: 2, title: '5 Days Before', desc: 'Submit room photos and confirm event schedule & details' },
-                  { step: 3, title: 'Day Before', desc: 'Final checklist review and tech setup confirmation' },
-                  { step: 4, title: 'Event Day', desc: 'We arrive 1hr early, handle all setup, and capture your event' },
-                  { step: 5, title: 'Next Day', desc: 'Receive your edited video files via secure Dropbox link' }
-                ].map(({ step, title, desc }) => (
-                  <li key={step} className="text-center relative">
-                    <div className="relative bg-white py-2">
-                      <div className="w-12 h-12 rounded-full bg-[#0095ff] text-white font-bold text-lg flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-110 duration-300" aria-hidden="true">
-                        {step}
+                  {
+                    step: 1,
+                    title: 'Choose & Book',
+                    desc: 'Select your package and any add-ons you need. Book instantly online.',
+                    icon: (
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    step: 2,
+                    title: 'Share Details',
+                    desc: 'Submit your venue photos and event schedule through our simple online form.',
+                    icon: (
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    step: 3,
+                    title: 'Pre-Event Check',
+                    desc: "We'll review everything and confirm technical requirements the day before.",
+                    icon: (
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    step: 4,
+                    title: 'Event Day',
+                    desc: 'We arrive early, handle all setup, and deliver professional video coverage.',
+                    icon: (
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    step: 5,
+                    title: 'Next-Day Delivery',
+                    desc: 'Receive your edited video content via secure Dropbox link within 24 hours.',
+                    icon: (
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      </svg>
+                    ),
+                  },
+                ].map(({ step, title, desc, icon }) => (
+                  <li key={step} className="relative">
+                    <div className="flex flex-col items-center">
+                      {/* Step number with icon */}
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-full bg-[#0095ff] text-white flex items-center justify-center mx-auto shadow-lg transform transition-transform hover:scale-110 duration-300">
+                          {icon}
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#072948] text-white text-sm font-bold flex items-center justify-center">
+                          {step}
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-8">
-                      <h3 className="text-[#072948] font-semibold text-lg mb-3">{title}</h3>
-                      <p className="text-gray-600 leading-relaxed">{desc}</p>
+                      
+                      {/* Content */}
+                      <div className="mt-6 text-center">
+                        <h3 className="text-[#072948] font-semibold text-lg mb-2">{title}</h3>
+                        <p className="text-gray-600 leading-relaxed">{desc}</p>
+                      </div>
                     </div>
                   </li>
                 ))}
               </ol>
+
+              {/* CTA Button */}
+              <div className="text-center mt-16">
+                <button
+                  onClick={() => handleScroll('packages')}
+                  className="inline-flex items-center gap-2 bg-[#0095ff] hover:bg-[#007acc] text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  Get Started Now
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </section>
