@@ -281,7 +281,7 @@ export function HomeContent() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {[
                 { number: "20+", label: "Years Experience" },
-                { number: "1000+", label: "Events Filmed" },
+                { number: "100s", label: "Events Filmed" },
                 { number: "98%", label: "Client Satisfaction" },
                 { number: "24hr", label: "Delivery Time" }
               ].map((stat, index) => (

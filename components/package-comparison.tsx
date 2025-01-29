@@ -90,13 +90,13 @@ export function PackageComparison({
           <div 
             key={pkg.id}
             className={cn(
-              "bg-white rounded-lg border transition-all duration-300",
-              pkg.id === 'webinar' && "relative",
-              selectedPackageId === pkg.id ? "border-[#0095ff]" : "border-gray-200",
+              "bg-white rounded-lg border transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-[#0095ff]/50",
+              pkg.id === 'training' && "relative",
+              selectedPackageId === pkg.id ? "border-[#0095ff] shadow-md" : "border-gray-200",
               showAddOns && selectedPackageForAddOns && selectedPackageForAddOns.id !== pkg.id && "opacity-30"
             )}
           >
-            {pkg.id === 'webinar' && (
+            {pkg.id === 'training' && (
               <div className="absolute -top-3 right-4 bg-[#0095ff] text-white px-3 py-1 text-sm font-medium rounded-md">
                 Most Popular
               </div>
