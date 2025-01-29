@@ -289,8 +289,8 @@ export default function InventoryPage() {
                         <p className="text-sm text-gray-500">{item.category}</p>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>
-                        <div className="mt-2 flex flex-wrap gap-1">
+                        <p className="text-sm text-gray-600 mb-4">{item.description}</p>
+                        <div className="flex flex-wrap gap-1">
                           {renderTags(item)}
                         </div>
                       </CardContent>
