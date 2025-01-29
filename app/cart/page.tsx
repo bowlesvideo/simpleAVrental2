@@ -137,33 +137,49 @@ function getTenBusinessDaysAhead(): Date {
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart, addPackage, addAddOn } = useCart()
-  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const [step, setStep] = useState(1)
+  const [showErrors, setShowErrors] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  // Event Details
   const [eventDate, setEventDate] = useState<Date | null>(null)
-  const [eventStartTime, setEventStartTime] = useState('09:00')
-  const [eventEndTime, setEventEndTime] = useState('11:00')
+  const [eventStartTime, setEventStartTime] = useState('')
+  const [eventEndTime, setEventEndTime] = useState('')
   const [eventLocation, setEventLocation] = useState('')
-  const [street, setStreet] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('FL')
-  const [zip, setZip] = useState('')
+  
+  // Contact Information
   const [companyName, setCompanyName] = useState('')
   const [contactName, setContactName] = useState('')
-  const [contactPhone, setContactPhone] = useState('')
   const [contactEmail, setContactEmail] = useState('')
-  const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [showErrors, setShowErrors] = useState(false)
+  const [contactPhone, setContactPhone] = useState('')
+  const [street, setStreet] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [zip, setZip] = useState('')
+  const [emailUpdates, setEmailUpdates] = useState(true)
+  const [smsUpdates, setSmsUpdates] = useState(false)
+
+  // Update eventLocation when address fields change
+  useEffect(() => {
+    if (street && city && state && zip) {
+      setEventLocation(`${street}, ${city}, ${state} ${zip}`)
+    }
+  }, [street, city, state, zip])
+
+  // Validation errors state
   const [validationErrors, setValidationErrors] = useState<{
-    eventDate?: boolean;
-    eventStartTime?: boolean;
-    eventEndTime?: boolean;
-    companyName?: boolean;
-    contactName?: boolean;
-    contactEmail?: boolean;
-    eventLocation?: boolean;
-    city?: boolean;
-    state?: boolean;
-    zip?: boolean;
+    eventDate?: boolean
+    eventStartTime?: boolean
+    eventEndTime?: boolean
+    companyName?: boolean
+    contactName?: boolean
+    contactEmail?: boolean
+    street?: boolean
+    city?: boolean
+    state?: boolean
+    zip?: boolean
+    eventLocation?: boolean
   }>({})
   const [showAddOns, setShowAddOns] = useState(false)
   const [selectedPackageForAddOns, setSelectedPackageForAddOns] = useState<CartItem | null>(null)
@@ -431,19 +447,33 @@ export default function CartPage() {
 
   const handleNextStep = () => {
     if (step === 1) {
-      const isValid = validateStep1()
-      if (!isValid) {
+      const errors = {
+        eventDate: !eventDate,
+        eventStartTime: !eventStartTime,
+        eventEndTime: !eventEndTime
+      }
+      if (Object.values(errors).some(Boolean)) {
+        setValidationErrors(errors)
         setShowErrors(true)
         return
       }
     } else if (step === 2) {
-      const isValid = validateStep2()
-      if (!isValid) {
+      const errors = {
+        companyName: !companyName,
+        contactName: !contactName,
+        contactEmail: !contactEmail,
+        street: !street,
+        city: !city,
+        state: !state,
+        zip: !zip
+      }
+      if (Object.values(errors).some(Boolean)) {
+        setValidationErrors(errors)
         setShowErrors(true)
         return
       }
     }
-    nextStep()
+    setStep(prev => Math.min(prev + 1, 3) as 1 | 2 | 3)
   }
 
   const handleStepClick = (targetStep: number) => {
@@ -493,16 +523,17 @@ export default function CartPage() {
         eventDate: eventDate?.toISOString(),
         eventStartTime,
         eventEndTime,
-        eventLocation,
-        contactDetails: {
-          companyName,
-          contactName,
-          contactEmail,
-          contactPhone,
+        eventLocation: {
           street,
           city,
           state,
           zip
+        },
+        contactDetails: {
+          companyName,
+          contactName,
+          contactEmail,
+          contactPhone
         },
         total
       }
@@ -697,100 +728,164 @@ export default function CartPage() {
                 showErrors && validationErrors.eventDate && "ring-2 ring-red-500"
               )}>
                 <CardHeader className="pb-3">
-                  <CardTitle>Event Details</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <span>Event Details</span>
+                    <span className="text-sm font-normal text-[#0095ff]">Step 1 of 3</span>
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Let's start by getting your event details. Our team will review this information and prepare everything needed for a successful production.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col lg:flex-row gap-6">
-                    <div className="w-full lg:flex-1">
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.eventDate && "text-red-500"
-                      )}>
-                        Event Date {showErrors && validationErrors.eventDate && "- Required"}
-                      </Label>
-                      <Calendar
-                        mode="single"
-                        selected={eventDate || undefined}
-                        onSelect={(date) => {
-                          setEventDate(date || null)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, eventDate: !date}))
-                          }
-                        }}
-                        className={cn(
-                          "rounded-md border w-full",
-                          showErrors && validationErrors.eventDate && "border-red-500"
-                        )}
-                        disabled={{ before: new Date() }}
-                      />
+                  <div className="space-y-6">
+                    {/* Process Steps */}
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                      <h3 className="font-medium text-[#072948] mb-3">What happens next?</h3>
+                      <ol className="space-y-2 text-sm text-gray-600">
+                        <li className="flex items-start gap-2">
+                          <span className="font-medium text-[#0095ff]">1.</span>
+                          <span>Submit your event details and complete booking</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="font-medium text-[#0095ff]">2.</span>
+                          <span>Our team reviews your requirements within 24 hours</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="font-medium text-[#0095ff]">3.</span>
+                          <span>We'll send a detailed production schedule and setup plan</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="font-medium text-[#0095ff]">4.</span>
+                          <span>Pre-event technical check one day before</span>
+                        </li>
+                      </ol>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.eventStartTime && "text-red-500"
-                      )}>
-                        Start Time {showErrors && validationErrors.eventStartTime && "- Required"}
-                      </Label>
-                      <Select 
-                        value={eventStartTime} 
-                        onValueChange={(value) => {
-                          setEventStartTime(value)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, eventStartTime: !value}))
-                          }
-                        }}
-                      >
-                        <SelectTrigger className={cn(
-                          showErrors && validationErrors.eventStartTime && "border-red-500"
+
+                    <div className="flex flex-col lg:flex-row gap-6">
+                      <div className="w-full lg:w-7/12">
+                        <Label className={cn(
+                          "text-sm font-medium mb-2 block",
+                          showErrors && validationErrors.eventDate && "text-red-500"
                         )}>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 24 }, (_, i) => {
-                            const hour = i.toString().padStart(2, '0')
-                            return (
-                              <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
-                                {`${hour}:00`}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectContent>
-                      </Select>
+                          Event Date {showErrors && validationErrors.eventDate && "- Required"}
+                        </Label>
+                        <div className="relative">
+                          <Calendar
+                            mode="single"
+                            selected={eventDate || undefined}
+                            onSelect={(date) => {
+                              setEventDate(date || null)
+                              if (showErrors) {
+                                setValidationErrors(prev => ({...prev, eventDate: !date}))
+                              }
+                            }}
+                            className={cn(
+                              "rounded-md border w-full",
+                              showErrors && validationErrors.eventDate && "border-red-500"
+                            )}
+                            disabled={{ before: new Date() }}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            We recommend booking at least 4 days in advance for optimal preparation
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="w-full lg:w-5/12 space-y-4">
+                        <div>
+                          <Label className={cn(
+                            "text-sm font-medium mb-2 block",
+                            showErrors && validationErrors.eventStartTime && "text-red-500"
+                          )}>
+                            Start Time {showErrors && validationErrors.eventStartTime && "- Required"}
+                          </Label>
+                          <select
+                            value={eventStartTime}
+                            onChange={(e) => {
+                              setEventStartTime(e.target.value)
+                              if (showErrors) {
+                                setValidationErrors(prev => ({...prev, eventStartTime: !e.target.value}))
+                              }
+                            }}
+                            className={cn(
+                              "w-full rounded-md border bg-white px-3 py-2",
+                              showErrors && validationErrors.eventStartTime && "border-red-500"
+                            )}
+                          >
+                            <option value="">Select start time</option>
+                            {Array.from({ length: 24 }, (_, i) => {
+                              const hour = i.toString().padStart(2, '0')
+                              return (
+                                <option key={hour} value={`${hour}:00`}>
+                                  {`${hour}:00`}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <Label className={cn(
+                            "text-sm font-medium mb-2 block",
+                            showErrors && validationErrors.eventEndTime && "text-red-500"
+                          )}>
+                            End Time {showErrors && validationErrors.eventEndTime && "- Required"}
+                          </Label>
+                          <select
+                            value={eventEndTime}
+                            onChange={(e) => {
+                              setEventEndTime(e.target.value)
+                              if (showErrors) {
+                                setValidationErrors(prev => ({...prev, eventEndTime: !e.target.value}))
+                              }
+                            }}
+                            className={cn(
+                              "w-full rounded-md border bg-white px-3 py-2",
+                              showErrors && validationErrors.eventEndTime && "border-red-500"
+                            )}
+                          >
+                            <option value="">Select end time</option>
+                            {Array.from({ length: 24 }, (_, i) => {
+                              const hour = i.toString().padStart(2, '0')
+                              return (
+                                <option key={hour} value={`${hour}:00`}>
+                                  {`${hour}:00`}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.eventEndTime && "text-red-500"
-                      )}>
-                        End Time {showErrors && validationErrors.eventEndTime && "- Required"}
-                      </Label>
-                      <Select 
-                        value={eventEndTime} 
-                        onValueChange={(value) => {
-                          setEventEndTime(value)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, eventEndTime: !value}))
-                          }
-                        }}
-                      >
-                        <SelectTrigger className={cn(
-                          showErrors && validationErrors.eventEndTime && "border-red-500"
-                        )}>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 24 }, (_, i) => {
-                            const hour = i.toString().padStart(2, '0')
-                            return (
-                              <SelectItem key={`${hour}:00`} value={`${hour}:00`}>
-                                {`${hour}:00`}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectContent>
-                      </Select>
+
+                    {/* Trust Indicators */}
+                    <div className="border-t pt-6 mt-6">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg className="w-5 h-5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                          <span>Secure Booking Process</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg className="w-5 h-5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>24hr Support</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg className="w-5 h-5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>20+ Years Experience</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <svg className="w-5 h-5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                          </svg>
+                          <span>98% Client Satisfaction</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -926,14 +1021,19 @@ export default function CartPage() {
         {step === 2 && (
           <section className="grid grid-cols-1 lg:grid-cols-12 gap-8" aria-label="Contact information form">
             <div className="lg:col-span-6">
-              <Card className={cn(
-                showErrors && (validationErrors.companyName || validationErrors.contactName || validationErrors.contactEmail) && "ring-2 ring-red-500"
-              )}>
+              <Card>
                 <CardHeader className="pb-3">
-                  <CardTitle>Contact Information</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <span>Contact Information</span>
+                    <span className="text-sm font-normal text-[#0095ff]">Step 2 of 3</span>
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Please provide your contact details. We'll use this information to coordinate your event and send confirmation details.
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* Company Information */}
                     <div>
                       <Label className={cn(
                         "text-sm font-medium mb-2 block",
@@ -941,7 +1041,7 @@ export default function CartPage() {
                       )}>
                         Company Name {showErrors && validationErrors.companyName && "- Required"}
                       </Label>
-                      <Input
+                      <input
                         type="text"
                         value={companyName}
                         onChange={(e) => {
@@ -951,168 +1051,219 @@ export default function CartPage() {
                           }
                         }}
                         className={cn(
+                          "w-full rounded-md border bg-white px-3 py-2",
                           showErrors && validationErrors.companyName && "border-red-500"
                         )}
-                        placeholder="Enter company name"
-                        autoComplete="organization"
                       />
                     </div>
-                    <div>
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.eventLocation && "text-red-500"
-                      )}>
-                        Event Location {showErrors && validationErrors.eventLocation && "- Required"}
-                      </Label>
-                      <Input
-                        value={eventLocation}
-                        onChange={(e) => {
-                          setEventLocation(e.target.value)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, eventLocation: !e.target.value}))
-                          }
-                        }}
-                        className={cn(
-                          showErrors && validationErrors.eventLocation && "border-red-500"
-                        )}
-                        placeholder="Enter event location"
-                        autoComplete="street-address"
-                      />
-                    </div>
-                    <div className="grid grid-cols-6 gap-4">
-                      <div className="col-span-2">
+
+                    {/* Contact Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
                         <Label className={cn(
                           "text-sm font-medium mb-2 block",
-                          showErrors && validationErrors.city && "text-red-500"
+                          showErrors && validationErrors.contactName && "text-red-500"
                         )}>
-                          City {showErrors && validationErrors.city && "- Required"}
+                          Contact Name {showErrors && validationErrors.contactName && "- Required"}
                         </Label>
-                        <Input
-                          value={city}
+                        <input
+                          type="text"
+                          value={contactName}
                           onChange={(e) => {
-                            setCity(e.target.value)
+                            setContactName(e.target.value)
                             if (showErrors) {
-                              setValidationErrors(prev => ({...prev, city: !e.target.value}))
+                              setValidationErrors(prev => ({...prev, contactName: !e.target.value}))
                             }
                           }}
                           className={cn(
-                            showErrors && validationErrors.city && "border-red-500"
+                            "w-full rounded-md border bg-white px-3 py-2",
+                            showErrors && validationErrors.contactName && "border-red-500"
                           )}
-                          placeholder="Enter city"
                         />
                       </div>
-                      <div className="col-span-2">
+                      <div>
                         <Label className={cn(
                           "text-sm font-medium mb-2 block",
-                          showErrors && validationErrors.state && "text-red-500"
+                          showErrors && validationErrors.contactEmail && "text-red-500"
                         )}>
-                          State {showErrors && validationErrors.state && "- Required"}
+                          Email {showErrors && validationErrors.contactEmail && "- Required"}
                         </Label>
-                        <Select 
-                          value={state} 
-                          onValueChange={(value) => {
-                            setState(value)
-                            if (showErrors) {
-                              setValidationErrors(prev => ({...prev, state: !value}))
-                            }
-                          }}
-                        >
-                          <SelectTrigger className={cn(
-                            showErrors && validationErrors.state && "border-red-500"
-                          )}>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {US_STATES.map((s) => (
-                              <SelectItem key={s.value} value={s.value}>
-                                {s.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {state && state !== 'FL' && (
-                          <p className="text-red-500 text-sm mt-2">
-                            We only support events in Florida at this time. Please contact us for questions
-                          </p>
-                        )}
-                      </div>
-                      <div className="col-span-2">
-                        <Label className={cn(
-                          "text-sm font-medium mb-2 block",
-                          showErrors && validationErrors.zip && "text-red-500"
-                        )}>
-                          ZIP Code {showErrors && validationErrors.zip && "- Required"}
-                        </Label>
-                        <Input
-                          value={zip}
+                        <input
+                          type="email"
+                          value={contactEmail}
                           onChange={(e) => {
-                            setZip(e.target.value)
+                            setContactEmail(e.target.value)
                             if (showErrors) {
-                              setValidationErrors(prev => ({...prev, zip: !e.target.value}))
+                              setValidationErrors(prev => ({...prev, contactEmail: !e.target.value}))
                             }
                           }}
                           className={cn(
-                            showErrors && validationErrors.zip && "border-red-500"
+                            "w-full rounded-md border bg-white px-3 py-2",
+                            showErrors && validationErrors.contactEmail && "border-red-500"
                           )}
-                          placeholder="ZIP"
                         />
                       </div>
                     </div>
+
                     <div>
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.contactName && "text-red-500"
-                      )}>
-                        Contact Name {showErrors && validationErrors.contactName && "- Required"}
+                      <Label className="text-sm font-medium mb-2 block">
+                        Phone (Optional)
                       </Label>
-                      <Input
-                        type="text"
-                        value={contactName}
-                        onChange={(e) => {
-                          setContactName(e.target.value)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, contactName: !e.target.value}))
-                          }
-                        }}
-                        className={cn(
-                          showErrors && validationErrors.contactName && "border-red-500"
-                        )}
-                        placeholder="Enter full name"
-                        autoComplete="name"
-                      />
-                    </div>
-                    <div>
-                      <Label className={cn(
-                        "text-sm font-medium mb-2 block",
-                        showErrors && validationErrors.contactEmail && "text-red-500"
-                      )}>
-                        Contact Email {showErrors && validationErrors.contactEmail && "- Required"}
-                      </Label>
-                      <Input
-                        type="email"
-                        value={contactEmail}
-                        onChange={(e) => {
-                          setContactEmail(e.target.value)
-                          if (showErrors) {
-                            setValidationErrors(prev => ({...prev, contactEmail: !e.target.value}))
-                          }
-                        }}
-                        className={cn(
-                          showErrors && validationErrors.contactEmail && "border-red-500"
-                        )}
-                        placeholder="Enter email address"
-                        autoComplete="email"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">Contact Phone (Optional)</Label>
-                      <Input
+                      <input
                         type="tel"
                         value={contactPhone}
-                        onChange={(e) => setContactPhone(formatPhone(e.target.value))}
-                        placeholder="Enter phone number"
-                        autoComplete="tel"
+                        onChange={(e) => setContactPhone(e.target.value)}
+                        className="w-full rounded-md border bg-white px-3 py-2"
+                        placeholder="(123) 456-7890"
                       />
+                    </div>
+
+                    {/* Event Location */}
+                    <div className="border-t pt-6">
+                      <h3 className="font-medium text-[#072948] mb-4">Event Location</h3>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <Label className={cn(
+                            "text-sm font-medium mb-2 block",
+                            showErrors && validationErrors.street && "text-red-500"
+                          )}>
+                            Street Address {showErrors && validationErrors.street && "- Required"}
+                          </Label>
+                          <input
+                            type="text"
+                            value={street}
+                            onChange={(e) => {
+                              setStreet(e.target.value)
+                              if (showErrors) {
+                                setValidationErrors(prev => ({...prev, street: !e.target.value}))
+                              }
+                            }}
+                            className={cn(
+                              "w-full rounded-md border bg-white px-3 py-2",
+                              showErrors && validationErrors.street && "border-red-500"
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div>
+                            <Label className={cn(
+                              "text-sm font-medium mb-2 block",
+                              showErrors && validationErrors.city && "text-red-500"
+                            )}>
+                              City {showErrors && validationErrors.city && "- Required"}
+                            </Label>
+                            <input
+                              type="text"
+                              value={city}
+                              onChange={(e) => {
+                                setCity(e.target.value)
+                                if (showErrors) {
+                                  setValidationErrors(prev => ({...prev, city: !e.target.value}))
+                                }
+                              }}
+                              className={cn(
+                                "w-full rounded-md border bg-white px-3 py-2",
+                                showErrors && validationErrors.city && "border-red-500"
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <Label className={cn(
+                              "text-sm font-medium mb-2 block",
+                              showErrors && validationErrors.state && "text-red-500"
+                            )}>
+                              State {showErrors && validationErrors.state && "- Required"}
+                            </Label>
+                            <select
+                              value={state}
+                              onChange={(e) => {
+                                setState(e.target.value)
+                                if (showErrors) {
+                                  setValidationErrors(prev => ({...prev, state: !e.target.value}))
+                                }
+                              }}
+                              className={cn(
+                                "w-full rounded-md border bg-white px-3 py-2",
+                                showErrors && validationErrors.state && "border-red-500"
+                              )}
+                            >
+                              <option value="">Select state</option>
+                              <option value="FL">Florida</option>
+                              <option value="GA">Georgia</option>
+                              <option value="SC">South Carolina</option>
+                              <option value="NC">North Carolina</option>
+                              <option value="AL">Alabama</option>
+                            </select>
+                          </div>
+                          <div>
+                            <Label className={cn(
+                              "text-sm font-medium mb-2 block",
+                              showErrors && validationErrors.zip && "text-red-500"
+                            )}>
+                              ZIP Code {showErrors && validationErrors.zip && "- Required"}
+                            </Label>
+                            <input
+                              type="text"
+                              value={zip}
+                              onChange={(e) => {
+                                setZip(e.target.value)
+                                if (showErrors) {
+                                  setValidationErrors(prev => ({...prev, zip: !e.target.value}))
+                                }
+                              }}
+                              className={cn(
+                                "w-full rounded-md border bg-white px-3 py-2",
+                                showErrors && validationErrors.zip && "border-red-500"
+                              )}
+                              maxLength={5}
+                              placeholder="12345"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Communication Preferences */}
+                    <div className="border-t pt-6">
+                      <h3 className="font-medium text-[#072948] mb-4">How We'll Keep You Updated</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                          <svg className="w-5 h-5 mt-0.5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <div className="text-sm text-gray-600">
+                            <p className="font-medium text-[#072948]">Email Communications</p>
+                            <p>We'll send order confirmation, setup details, and important updates to {contactEmail || 'your email'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <svg className="w-5 h-5 mt-0.5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          <div className="text-sm text-gray-600">
+                            <p className="font-medium text-[#072948]">Text Message Updates</p>
+                            <p>{contactPhone ? `We'll send day-of coordination messages to ${contactPhone}` : 'Add a phone number to receive day-of coordination messages'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          <svg className="w-5 h-5 mt-0.5 text-[#0095ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div className="text-sm text-gray-600">
+                            <p className="font-medium text-[#072948]">Communication Schedule</p>
+                            <ul className="space-y-1 list-inside">
+                              <li>• Order confirmation - Immediate</li>
+                              <li>• Setup details - 48 hours before</li>
+                              <li>• Technical check reminder - 24 hours before</li>
+                              <li>• Day-of coordination - Event day</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -1273,9 +1424,9 @@ export default function CartPage() {
           </section>
         )}
 
-        {/* Mobile navigation at bottom of content */}
-        <div className="lg:hidden mt-8">
-          <div className="flex justify-between">
+        {/* Mobile Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t lg:hidden">
+          <div className="flex justify-between max-w-7xl mx-auto">
             <Button
               variant="outline"
               onClick={prevStep}
@@ -1284,18 +1435,16 @@ export default function CartPage() {
             >
               Previous
             </Button>
-            {step !== 3 && (
-              <Button
-                onClick={handleNextStep}
-                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
-              >
-                Next
-              </Button>
-            )}
+            <Button
+              onClick={handleNextStep}
+              className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+            >
+              Next
+            </Button>
           </div>
         </div>
 
-        {/* Desktop navigation */}
+        {/* Desktop Navigation */}
         <div className="hidden lg:block">
           <section className="flex justify-between mt-8" aria-label="Navigation controls">
             <Button
@@ -1306,14 +1455,12 @@ export default function CartPage() {
             >
               Previous
             </Button>
-            {step !== 3 && (
-              <Button
-                onClick={handleNextStep}
-                className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
-              >
-                Next
-              </Button>
-            )}
+            <Button
+              onClick={handleNextStep}
+              className="bg-[#0095ff] text-white hover:bg-[#007acc] w-[120px]"
+            >
+              Next
+            </Button>
           </section>
         </div>
 
