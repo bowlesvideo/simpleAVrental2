@@ -121,7 +121,7 @@ export function PackageComparison({
               
               {/* Use Case Labels */}
               <div className="flex flex-wrap gap-2 mb-4">
-                {getUseCaseLabels(pkg.id).map((label, idx) => (
+                {pkg.useCaseLabels?.map((label, idx) => (
                   <span 
                     key={idx} 
                     className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-[#e8f0f9] text-[#0095ff] border border-[#0095ff]/10"
@@ -390,7 +390,7 @@ function getUseCaseLabels(packageId: string): string[] {
       'Educational Events',
       'Skill Development'
     ],
-    'package-4': [  // Updated from 'townhall' to 'package-4'
+    'townhall': [  // Changed from 'package-4' to 'townhall'
       'Ballrooms',
       'Theaters',
       'Convention Halls',

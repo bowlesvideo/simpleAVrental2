@@ -688,6 +688,27 @@ const AdminPage = () => {
     }
   };
 
+  const handleAddUseCaseLabel = (packageIndex: number) => {
+    const updatedPackages = [...packages];
+    if (!updatedPackages[packageIndex].useCaseLabels) {
+      updatedPackages[packageIndex].useCaseLabels = [];
+    }
+    updatedPackages[packageIndex].useCaseLabels.push('');
+    setPackages(updatedPackages);
+  };
+
+  const handleUseCaseLabelChange = (packageIndex: number, labelIndex: number, value: string) => {
+    const updatedPackages = [...packages];
+    updatedPackages[packageIndex].useCaseLabels[labelIndex] = value;
+    setPackages(updatedPackages);
+  };
+
+  const handleDeleteUseCaseLabel = (packageIndex: number, labelIndex: number) => {
+    const updatedPackages = [...packages];
+    updatedPackages[packageIndex].useCaseLabels.splice(labelIndex, 1);
+    setPackages(updatedPackages);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -954,6 +975,41 @@ const AdminPage = () => {
                                         </div>
                                       ))}
                                     </div>
+                                  </div>
+                                </div>
+
+                                {/* Use Case Labels Section */}
+                                <div className="space-y-4 mt-6">
+                                  <div className="flex justify-between items-center">
+                                    <h3 className="text-lg font-semibold">Use Case Labels</h3>
+                                    <Button 
+                                      onClick={() => handleAddUseCaseLabel(index)}
+                                      variant="outline"
+                                      size="sm"
+                                    >
+                                      Add Label
+                                    </Button>
+                                  </div>
+                                  
+                                  <div className="space-y-2">
+                                    {pkg.useCaseLabels?.map((label, labelIndex) => (
+                                      <div key={labelIndex} className="flex items-center gap-2">
+                                        <Input
+                                          value={label}
+                                          onChange={(e) => handleUseCaseLabelChange(index, labelIndex, e.target.value)}
+                                          placeholder="Enter use case label"
+                                          className="flex-1"
+                                        />
+                                        <Button
+                                          onClick={() => handleDeleteUseCaseLabel(index, labelIndex)}
+                                          variant="ghost"
+                                          size="sm"
+                                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                        >
+                                          <Trash className="w-4 h-4" />
+                                        </Button>
+                                      </div>
+                                    ))}
                                   </div>
                                 </div>
 

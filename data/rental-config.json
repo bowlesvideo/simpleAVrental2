@@ -38,6 +38,12 @@
         "All necessary cables and equipment",
         "Video editing and color correction",
         "Secure online delivery"
+      ],
+      "useCaseLabels": [
+        "Board Meetings",
+        "Team Updates",
+        "Client Presentations",
+        "Small Groups"
       ]
     },
     {
@@ -78,6 +84,12 @@
         "Backup internet connection",
         "Video editing and color correction",
         "Secure online delivery"
+      ],
+      "useCaseLabels": [
+        "Virtual Events",
+        "Webinars",
+        "Online Summits",
+        "Live Streams"
       ]
     },
     {
@@ -118,6 +130,12 @@
         "Multiple viewing angles",
         "Video editing and color correction",
         "Secure online delivery"
+      ],
+      "useCaseLabels": [
+        "Workshops",
+        "Training Sessions",
+        "Educational Events",
+        "Skill Development"
       ]
     },
     {
@@ -158,6 +176,12 @@
         "Multiple viewing angles",
         "Video editing and color correction",
         "Secure online delivery"
+      ],
+      "useCaseLabels": [
+        "Ballrooms",
+        "Theaters",
+        "Convention Halls",
+        "Auditoriums"
       ]
     }
   ],

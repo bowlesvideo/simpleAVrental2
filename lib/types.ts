@@ -15,6 +15,7 @@ export interface Package {
   additionalImages?: string[]
   keyFeatures: PackageFeature[]
   includedItems: string[]
+  useCaseLabels: string[]
 }
 
 export interface AddOn {
